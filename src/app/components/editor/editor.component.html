@@ -1,0 +1,46 @@
+<dx-html-editor #editor class="editor-body" [value]="editorValue.value" (valueChange)="changeEvent($event)"></dx-html-editor>
+<div class="container-fluid">
+    <div class="editor-toolbar row justify-content-center">    
+        <button mat-button (click)="toggleBold()">
+            <mat-icon class="toolbar-icon">format_bold</mat-icon>
+        </button>
+        <button mat-button (click)="toggleItalic()">
+             <mat-icon class="toolbar-icon">format_italic</mat-icon>
+        </button>
+        <button mat-button (click)="toggleUnderline()">
+            <mat-icon class="toolbar-icon">format_underline</mat-icon>
+        </button> 
+        <button mat-button (click)="toggleBulletList()">
+            <mat-icon class="toolbar-icon">format_list_bulleted</mat-icon>
+        </button> 
+        <button mat-button (click)="toggleNumberList()">
+            <mat-icon class="toolbar-icon">format_list_numbered</mat-icon>
+        </button>
+        <button mat-button (click)="alignLeft()">
+            <mat-icon class="toolbar-icon">format_align_left</mat-icon>
+        </button> 
+        <button mat-button (click)="alignCenter()">
+            <mat-icon class="toolbar-icon">format_align_center</mat-icon>
+        </button>
+    	<button mat-button (click)="alignRight()">
+            <mat-icon class="toolbar-icon">format_align_right</mat-icon>
+        </button>
+        <!-- Text color Menu -->
+        <button  mat-button [matMenuTriggerFor]="textColorPalatte">
+            <mat-icon class="toolbar-icon">format_color_text</mat-icon>
+        </button>
+        <mat-menu  class="d-flex row" #textColorPalatte="matMenu">
+            <span  mat-menu-item [disableRipple]="true" (click) = "$event.stopPropagation()">
+                <color-palette (change)="setTextColor($event)"></color-palette>
+            </span>
+        </mat-menu>
+        <button mat-button [matMenuTriggerFor]="fillColorPalatte" #trigger>
+            <mat-icon class="toolbar-icon">format_color_fill</mat-icon>
+        </button>
+        <mat-menu  class="d-flex row" #fillColorPalatte="matMenu">
+            <span  mat-menu-item [disableRipple]="true" (click) = "$event.stopPropagation()">
+                <color-palette initialColor="#FFFFFF" (change)="setFillColor($event)"></color-palette>
+            </span>
+        </mat-menu>
+    </div>
+</div>

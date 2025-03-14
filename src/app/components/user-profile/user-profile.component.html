@@ -1,0 +1,102 @@
+<div class="user-profile-styles">
+  <div class="card card-design" *ngIf="type == 'big'">
+    <div class="card-body" style="padding: 6px !important">
+      <!-- <div class="row justify-content-end" style="margin: -7px !important">
+        <button mat-icon-button [matMenuTriggerFor]="menu">
+          <mat-icon style="color: #847E7E; ">more_vert</mat-icon>
+        </button>
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item (click)="removeMember()">
+            <span>Remove</span>
+          </button>
+        </mat-menu>
+      </div> -->
+      <div class="row justify-content-center">
+        <app-user-image [id]="oid" imgWidth="55px" imgHeight="55px"></app-user-image>
+      </div>
+      <div class="row justify-content-center pt-1" [matTooltip]="profile?.displayName">
+        <span class="username">{{ profile?.displayName }}</span>
+      </div>
+      <div class="row justify-content-center " style="color: #847E7E; font-size: 12px !important">
+        {{ profile?.jobTitle }}
+      </div>
+      <div class="row justify-content-center pt-1 flex-nowrap user-mail">
+        <mat-icon style="font-size: 17px !important">
+          mail_outline
+        </mat-icon>
+        {{ profile?.mail }}
+      </div>
+      <div class="row justify-content-center pb-1" style="color:  #1E2733; font-size: 12px !important">
+        <mat-icon style="font-size: 17px !important">
+          phone
+        </mat-icon>
+        -
+      </div>
+    </div>
+  </div>
+  <div *ngIf="type == 'medium'" class="d-flex flex-row pb-2 pb-lg-0 px-0">
+    <div style="flex:1">
+      <app-user-image class="my-auto pr-1" [id]="oid" imgWidth="32px" imgHeight="32px"></app-user-image>
+    </div>
+    <div style="flex:3; padding-left: 8px !important; width: 110px !important;" [matTooltip]="profile?.displayName">
+      <p class="m-0 header text-overflow ">{{ role }}</p>
+      <p class="m-0 data-label text-overflow ">
+        {{ profile?.displayName }}
+      </p>
+    </div>
+  </div>
+  <div *ngIf="type == 'small'">
+    <div class="d-flex flex-row pb-2 pb-lg-0 px-0 flex-nowrap">
+      <app-user-image class="my-auto pr-1" [id]="oid" imgWidth="24px" imgHeight="24px"></app-user-image>
+      <p class="text-overflow m-0 data-label pl-1">
+        {{ profile?.displayName }}
+      </p>
+    </div>
+  </div>
+  <div *ngIf="type == 'expense-card-data'">
+    <div class="d-flex flex-row pb-2 pb-lg-0 px-0 flex-nowrap">
+      <app-user-image class="my-auto pr-1" [id]="oid" imgWidth="24px" imgHeight="24px"></app-user-image>
+      <p class="text-overflow-expense m-0 data-label pl-1">
+        {{ profile?.displayName }}
+      </p>
+    </div>
+  </div>
+  <div *ngIf="type == 'user-badge'">
+    <div class="d-flex flex-row pb-2 pb-lg-0 px-0 flex-nowrap">
+      <div style="flex:1">
+        <app-user-image class="my-auto pr-1" [id]="oid" imgWidth="45px" imgHeight="45px"></app-user-image>
+      </div>
+      <div style="flex:6; padding-left: 8px !important; width: 250px !important;" [matTooltip]="profile?.displayName">
+        <p class="m-0 header text-overflow ">{{ role }}</p>
+        <p class="m-0 data-label text-overflow ">
+          {{ profile?.displayName }}
+        </p>
+      </div>
+    </div>
+  </div>
+  
+  <div *ngIf="type == 'name'" [id]="oid">
+    <p class="text-overflow-name m-0 data-label pl-0">
+      {{ profile?.displayName }}
+    </p>
+  </div>
+  
+  <div *ngIf="type == 'user_img'">
+    <app-user-image class="my-auto pr-1" [id]="oid" imgWidth="28px" imgHeight="28px"></app-user-image>
+  </div>
+  <div *ngIf="type == 'mini'">
+    {{ profile?.displayName }} <span style="padding-left: 10px;">
+      <app-user-image class="my-auto pr-1" [id]="oid" imgWidth="24px" imgHeight="24px"></app-user-image>
+    </span>
+  
+  </div>
+  <div *ngIf="type == 'filter-user-img'">
+    <div class="d-flex flex-row pb-2 pl-1 pb-lg-0 px-0 flex-nowrap">
+      <app-user-image class="my-auto pr-1" [id]="oid" imgWidth="18px" imgHeight="18px"></app-user-image>
+      <p class="text-overflow m-0 data-label filter-user-name pl-1">
+        {{ profile?.displayName }}
+      </p>
+    </div>
+  
+  </div>
+</div>

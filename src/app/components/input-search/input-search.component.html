@@ -1,0 +1,22 @@
+<mat-form-field appearance="outline">
+  <mat-label *ngIf="!hideMatLabel">{{ placeholder }}</mat-label>
+  <mat-select
+    [formControl]="fieldCtrl"
+    [placeholder]="placeholder"
+    #singleSelect
+    [required]="required"
+    [disabled]="disabled"
+  >
+    <mat-option>
+      <ngx-mat-select-search
+        [formControl]="fieldFilterCtrl"
+        [placeholderLabel]="placeholder"
+        noEntriesFoundLabel="No results found"
+      ></ngx-mat-select-search>
+    </mat-option>
+    <mat-option *ngIf="hasNoneOption" [value] ='null'>{{disableNone ? 'Select One' : 'None'}}</mat-option>
+    <mat-option *ngFor="let bank of filteredList | async" [value]="bank.id || bank._id" (click) = "emitChanges(bank)" [matTooltip]="bank.name">
+      {{ bank.name }}
+    </mat-option>
+  </mat-select>
+</mat-form-field>

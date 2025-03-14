@@ -1,0 +1,36 @@
+<div #ganttContainer class="gantt-chart-style">
+    <bryntum-gantt
+        class="bryntum-gantt"
+        style="height: 80vh;"
+        #gantt
+        [columns]                 = "ganttProps.columns"
+        [endDate]                 = "ganttProps.endDate"
+        [project]                 = "ganttProps.project"
+        [startDate]               = "ganttProps.startDate"
+        [projectLinesFeature]     = "ganttProps.features.projectLines"
+        (ready)="onGanttReady($event)"
+    ></bryntum-gantt>
+</div>
+<!-- <div class="gantt-chart-style">
+    <bryntum-gantt
+    class="bryntum-gantt"
+    style="height: 80vh;"
+    #gantt
+    [columns]="ganttProps.columns"
+    [endDate]="ganttProps.endDate"
+    [project]="ganttProps.project"
+    [startDate]="ganttProps.startDate"
+    [taskNonWorkingTimeFeature]="ganttProps.features.taskNonWorkingTime"
+    [nonWorkingTimeFeature]="ganttProps.features.nonWorkingTime"
+    (ready)="onGanttReady($event)"
+></bryntum-gantt>
+</div> -->
+
+<div>
+    <button (click)="getData()">
+        Get Data
+    </button>
+    <button (click)="consoleData()">
+        Console Data
+    </button>
+</div>

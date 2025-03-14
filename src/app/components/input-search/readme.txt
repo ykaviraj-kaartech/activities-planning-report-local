@@ -1,0 +1,1 @@
+This Component accepts { name: , id: } as input and returns id as Output

@@ -1,0 +1,187 @@
+<!--------------------------------Trigger--------------------------------------->
+<div [matTooltip]="isLoading? 'Loading...':'Associations' " style="width: fit-content;">
+    <button [disabled]="isLoading" class="iconbtn" (click)="$event.stopPropagation();openMenu()" mat-button
+        [matMenuTriggerFor]="mode=='view'?viewAssociations : editAssociations">Associations
+        <mat-icon class="icon-style">dataset_linked</mat-icon>({{totalAssociations}})
+        <mat-icon class="icon-style">arrow_drop_down</mat-icon>
+    </button>
+</div>
+
+<!--------------------------------View mode--------------------------------------->
+<mat-menu style="max-width: none !important;" yPosition="above" #viewAssociations="matMenu">
+    <ng-template [matMenuContent]>
+        <div style="height: 150px; min-width: 150px; width: max-content; padding: 10px;"
+            *ngIf="(assocData == null) || isLoading || isErr">
+            <mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
+            <div *ngIf="isLoading && !isErr">Fetching Details...</div>
+            <div *ngIf="!isLoading && isErr">Error Fetching associations! <button
+                    (click)="$event.stopPropagation();fetchAssocData()" mat-button>Click to Retry</button></div>
+        </div>
+        <div *ngIf="!(assocData == null) && !isLoading && !isErr">
+            <mat-drawer-container (click)="$event.stopPropagation()" style="width: max-content;"
+                class="example-container">
+                <mat-drawer mode="side" opened>
+                    <mat-button-toggle-group [(ngModel)]="assocNav" appearance="legacy">
+                        <mat-button-toggle ngDefaultControl value="accounts">Accounts
+                            ({{activityAssociation.accounts.length}})</mat-button-toggle>
+                        <mat-button-toggle ngDefaultControl value="contacts">Contacts
+                            ({{activityAssociation.contacts.length}})</mat-button-toggle>
+                        <mat-button-toggle ngDefaultControl value="leads">Leads
+                            ({{activityAssociation.leads.length}}) </mat-button-toggle>
+                        <mat-button-toggle ngDefaultControl value="opportunities">Opportunities
+                            ({{activityAssociation.opportunities.length}})</mat-button-toggle>
+                    </mat-button-toggle-group>
+                </mat-drawer>
+                <mat-drawer-content class="pt-2 pr-4 pl-4">
+
+                    <ng-container [ngSwitch]="assocNav">
+                        <ng-container *ngSwitchCase="'accounts'">
+                            <div *ngIf="activityAssociation.accounts.length==0">
+                                <span>No Associated Accounts</span>
+                            </div>
+                            <div *ngFor="let id of activityAssociation.accounts">
+                                <mat-checkbox [checked]="true" [disabled]="true">
+                                    {{assocData.associatedAccounts[id].customer_name}}
+                                </mat-checkbox>
+                            </div>
+                        </ng-container>
+
+                        <ng-container *ngSwitchCase="'contacts'">
+                            <div *ngIf="activityAssociation.contacts.length==0">
+                                <span>No Associated Contacts</span>
+                            </div>
+                            <div *ngFor="let id of activityAssociation.contacts">
+                                <mat-checkbox [checked]="true" [disabled]="true">
+                                    {{assocData.associatedContacts[id].first_name}}
+                                </mat-checkbox>
+                            </div>
+                        </ng-container>
+
+                        <ng-container *ngSwitchCase="'leads'">
+                            <div *ngIf="activityAssociation.leads.length==0">
+                                <span>No Associated Leads</span>
+                            </div>
+                            <div *ngFor="let id of activityAssociation.leads">
+                                <mat-checkbox [checked]="true" [disabled]="true">
+                                    {{assocData.associatedLeads[id].lead_name}}
+                                </mat-checkbox>
+                            </div>
+                        </ng-container>
+
+                        <ng-container *ngSwitchCase="'opportunities'">
+                            <div *ngIf="activityAssociation.opportunities.length==0">
+                                <span>No Associated opportunities</span>
+                            </div>
+                            <div *ngFor="let id of activityAssociation.opportunities">
+                                <mat-checkbox [checked]="true" [disabled]="true">
+                                    {{assocData.associatedOpportunities[id].opportunity_name}}
+                                </mat-checkbox>
+                            </div>
+                        </ng-container>
+                    </ng-container>
+                </mat-drawer-content>
+            </mat-drawer-container>
+        </div>
+    </ng-template>
+</mat-menu>
+
+<!--------------------------------Edit mode--------------------------------------->
+<mat-menu yPosition="above" (closed)="emitUpdate()" #editAssociations="matMenu">
+    <ng-template [matMenuContent]>
+        <div>
+            <mat-drawer-container (click)="$event.stopPropagation()" style="width: max-content;"
+                class="example-container">
+
+                <mat-drawer mode="side" opened>
+                    <mat-button-toggle-group [(ngModel)]="assocNav" appearance="legacy">
+                        <mat-button-toggle ngDefaultControl value="accounts">Accounts
+                            ({{activityAssociation.accounts.length}})</mat-button-toggle>
+                        <mat-button-toggle ngDefaultControl value="contacts">Contacts
+                            ({{activityAssociation.contacts.length}}))</mat-button-toggle>
+                        <mat-button-toggle ngDefaultControl value="leads">Leads
+                            ({{activityAssociation.leads.length}}) </mat-button-toggle>
+                        <mat-button-toggle ngDefaultControl value="opportunities">Opportunities
+                            ({{activityAssociation.opportunities.length}})</mat-button-toggle>
+                    </mat-button-toggle-group>
+                </mat-drawer>
+
+                <mat-drawer-content class="pt-2 pr-4 pl-4">
+                    <ng-container [ngSwitch]="assocNav">
+                        <ng-container *ngSwitchCase="'accounts'">
+                            <div *ngIf="accountsLength==0">
+                                <span>No Account have been linked</span>
+                            </div>
+                            <div *ngIf="defaultAssociation.account">
+                                <mat-checkbox [checked]="true" [disabled]="true">
+                                    {{assocData.associatedAccounts[defaultAssociation.account].customer_name}}
+                                </mat-checkbox>
+                            </div>
+                            <div *ngFor="let assocAccount of assocData.associatedAccounts | valueArray">
+                                <mat-checkbox *ngIf="$any(assocAccount).id!==defaultAssociation.account"
+                                    (change)="updateAssociatedAccounts($event.checked,$any(assocAccount).id)"
+                                    [checked]="isAccountChecked($any(assocAccount).id)">
+                                    {{$any(assocAccount).customer_name}}
+                                </mat-checkbox>
+                            </div>
+                        </ng-container>
+
+                        <ng-container *ngSwitchCase="'contacts'">
+                            <div *ngIf="contactsLength==0">
+                                <span>No Contacts have been linked</span>
+                            </div>
+                            <div *ngIf="defaultAssociation.contact">
+                                <mat-checkbox [checked]="true" [disabled]="true">
+                                    {{assocData.associatedContacts[defaultAssociation.contact].first_name}}
+                                </mat-checkbox>
+                            </div>
+                            <div *ngFor="let assocContact of assocData.associatedContacts | valueArray">
+                                <mat-checkbox *ngIf="$any(assocContact).id!==defaultAssociation.contact"
+                                    (change)="updateAssociatedContacts($event.checked,$any(assocContact).id)"
+                                    [checked]="isContactChecked($any(assocContact).id)">
+                                    {{$any(assocContact).first_name}}
+                                    {{$any(assocContact).last_name!='null'?$any(assocContact).last_name:''}}
+                                </mat-checkbox>
+                            </div>
+                        </ng-container>
+
+                        <ng-container *ngSwitchCase="'leads'">
+                            <div *ngIf="leadsLength==0">
+                                <span>No Leads have been linked</span>
+                            </div>
+                            <div *ngIf="defaultAssociation.lead">
+                                <mat-checkbox [checked]="true" [disabled]="true">
+                                    {{assocData.associatedLeads[defaultAssociation.lead].lead_name}}
+                                </mat-checkbox>
+                            </div>
+                            <div *ngFor="let assocLead of assocData.associatedLeads | valueArray">
+                                <mat-checkbox *ngIf="$any(assocLead).id!==defaultAssociation.lead"
+                                    (change)="updateAssociatedLeads($event.checked,$any(assocLead).id)"
+                                    [checked]="isLeadChecked($any(assocLead).id)">
+                                    {{$any(assocLead).lead_name}}
+                                </mat-checkbox>
+                            </div>
+                        </ng-container>
+
+                        <ng-container *ngSwitchCase="'opportunities'">
+                            <div *ngIf="opportunitiesLength==0">
+                                <span>No Opportunities have been linked</span>
+                            </div>
+                            <div *ngIf="defaultAssociation.opportunity">
+                                <mat-checkbox [checked]="true" [disabled]="true">
+                                    {{assocData.associatedOpportunities[defaultAssociation.opportunity].opportunity_name}}
+                                </mat-checkbox>
+                            </div>
+                            <div *ngFor="let assocOpportunity of assocData.associatedOpportunities | valueArray">
+                                <mat-checkbox *ngIf="$any(assocOpportunity).id!==defaultAssociation.opportunity"
+                                    (change)="updateAssociatedOpportunities($event.checked,$any(assocOpportunity).id)"
+                                    [checked]="isOpportunityChecked($any(assocOpportunity).id)">
+                                    {{$any(assocOpportunity).opportunity_name}}
+                                </mat-checkbox>
+                            </div>
+                        </ng-container>
+                    </ng-container>
+                </mat-drawer-content>
+            </mat-drawer-container>
+        </div>
+    </ng-template>
+</mat-menu>

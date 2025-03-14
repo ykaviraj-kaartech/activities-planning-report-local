@@ -1,0 +1,59 @@
+.user-profile-styles{
+  .card-design {
+      max-width: 200x !important;
+      min-width: 190px !important;
+      min-height: 195px !important;
+      max-height: 270px !important;
+      padding: 0 !important;
+    }
+    
+    .data-label {
+      font-size: 16px !important;
+    }
+    .header {
+      color: #5f5f5f;
+      font-size: 11px !important;
+    }
+    .user-mail {
+      color: #1e2733;
+      font-size: 12px !important;
+      white-space: nowrap;
+      overflow: hidden;
+      width: 100%;
+      text-overflow: ellipsis;
+    }
+    .text-overflow {
+      white-space: nowrap;
+      overflow: hidden;
+      width: 81%;
+      text-overflow: ellipsis;
+    }
+    
+    .text-overflow-expense {
+      white-space: nowrap;
+      padding-top: 5px;
+      overflow: hidden;
+      width: 90%;
+      font-size: 13px !important;
+      text-overflow: ellipsis;
+    }
+    
+    .username {
+      color: #1e2733;
+      font-size: 14px !important;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .text-overflow-name {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .filter-user-name {
+      padding-top: 2px !important;
+    }
+    
+}

@@ -1,0 +1,67 @@
+<!-- <div class="more-actions-styles">
+
+  <div class="more-actions-button"
+	cdkOverlayOrigin
+	#trigger="cdkOverlayOrigin"
+	[class.open]="isMenuOpenned"
+	(click)="isMenuOpenned = !isMenuOpenned">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+			<g id="Group">
+			<path id="Vector" d="M10 2.5C9.3125 2.5 8.75 3.0625 8.75 3.75C8.75 4.4375 9.3125 5 10 5C10.6875 5 11.25 4.4375 11.25 3.75C11.25 3.0625 10.6875 2.5 10 2.5ZM10 15C9.3125 15 8.75 15.5625 8.75 16.25C8.75 16.9375 9.3125 17.5 10 17.5C10.6875 17.5 11.25 16.9375 11.25 16.25C11.25 15.5625 10.6875 15 10 15ZM10 8.75C9.3125 8.75 8.75 9.3125 8.75 10C8.75 10.6875 9.3125 11.25 10 11.25C10.6875 11.25 11.25 10.6875 11.25 10C11.25 9.3125 10.6875 8.75 10 8.75Z" fill="#515965"/>
+			</g>
+		</svg>
+  </div>
+
+	<ng-template
+	cdkConnectedOverlay
+	[cdkConnectedOverlayOrigin]="trigger"
+	[cdkConnectedOverlayOpen]="isMenuOpenned"
+	(overlayOutsideClick)="isMenuOpenned = false">
+		<button (click)="onCreate()">
+			<mat-icon>add</mat-icon> Create
+		</button>
+		<button (click)="onEdit()">
+			<mat-icon>edit</mat-icon> Edit
+		</button>
+		<button (click)="onDelete()">
+			<mat-icon>delete</mat-icon> Delete
+		</button>
+	</ng-template>
+
+</div> -->
+<div class="more-actions-styles">
+  <div class="more-actions-button" #trigger="matMenuTrigger" [matMenuTriggerFor]="menu"
+    (click)="trigger.openMenu()">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <g id="Group">
+        <path id="Vector"
+          d="M10 2.5C9.3125 2.5 8.75 3.0625 8.75 3.75C8.75 4.4375 9.3125 5 10 5C10.6875 5 11.25 4.4375 11.25 3.75C11.25 3.0625 10.6875 2.5 10 2.5ZM10 15C9.3125 15 8.75 15.5625 8.75 16.25C8.75 16.9375 9.3125 17.5 10 17.5C10.6875 17.5 11.25 16.9375 11.25 16.25C11.25 15.5625 10.6875 15 10 15ZM10 8.75C9.3125 8.75 8.75 9.3125 8.75 10C8.75 10.6875 9.3125 11.25 10 11.25C10.6875 11.25 11.25 10.6875 11.25 10C11.25 9.3125 10.6875 8.75 10 8.75Z"
+          fill="#B9C0CA" />
+      </g>
+    </svg>
+  </div>
+	
+	<!-- Custom Context Menu -->
+	<!-- <ng-template #menuTemplate>
+		<div class="custom-menu">
+			<button class="menu-item" (click)="onEdit()">Edit</button>
+			<button class="menu-item" (click)="onDelete()">Delete</button>
+			<button class="menu-item" (click)="onCreate()">Create</button>
+		</div>
+	</ng-template> -->
+
+	<mat-menu #menu="matMenu">
+		<div class="card">
+			<div class="card-body">
+				<button mat-menu-item (click)="onEdit()">
+					
+					<span>
+						Edit
+					</span>
+				</button>
+				<button mat-menu-item (click)="onDelete()">Delete</button>
+			</div>
+		</div>
+	</mat-menu>
+
+</div>

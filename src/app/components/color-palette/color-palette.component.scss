@@ -1,0 +1,41 @@
+
+.current-color-check{
+    // color: aliceblue;
+    font-size: 14px;
+    font-weight: 500;
+}
+ 
+.current-color-check-light{
+    color: black;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.mat-icon-button{
+    height: 30px;
+    width: 30px;
+    // padding-bottom: 10px;
+}
+
+.mat-mini-fab.mat-accent{
+    background-color: red;
+}
+
+button:focus{
+    outline: 0!important;
+}
+
+.mat-icon{
+    margin: 0 !important;
+    margin-bottom: 10px !important;
+}
+
+.row{
+    margin: 0!important;
+}
+
+.grid{
+    display: grid;
+    grid-template-columns: repeat(5,auto);
+    grid-template-rows: repeat(2,auto);
+}

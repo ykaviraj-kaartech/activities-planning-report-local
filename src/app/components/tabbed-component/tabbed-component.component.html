@@ -1,0 +1,76 @@
+<div class="container-fluid createTabbedStyles">
+    <div class="row border-bottom solid">
+        <div class="col-12 ">
+            <div class="row pt-2 tab-row">
+                <div class="col-11 tab-content">
+                    <div class="row flex-row flex-nowrap">
+
+                        <mat-chip-list>
+                            <div *ngFor="let tab of tabbed_list; let i=index;">
+                                <mat-chip class="mat-chip mat-chip-style" *ngIf="tab.is_active && i<4"
+                                    (click)="displayComponent(tab.id)" [selectable]="tab.selected"
+                                    [selected]="tab.selected" [removable]="tab.removable" (removed)="removeTab(tab.id)">
+                                    <div class="mat-chip">{{tab.name}}</div>
+                                    <mat-icon class="icon-tray-button smallCardIcon" *ngIf="tab.mode=='View'"
+                                        (click)="editTab(i)">edit</mat-icon>
+                                    <mat-icon [ngStyle]="{'color': '#FFFFFF', 'opacity': '0.8'}" matChipRemove
+                                        *ngIf="tab.removable">cancel</mat-icon>
+                                </mat-chip>
+                            </div>
+                        </mat-chip-list>
+
+                        <mat-icon class="smallCardIcons pt-1" *ngIf="display_dropdown"
+                            [matMenuTriggerFor]="tab_dropdown">arrow_drop_down</mat-icon>
+                        <mat-menu #tab_dropdown="matMenu">
+                            <div *ngFor="let tab of tabbed_list; let i=index">
+                                <button mat-menu-item [ngClass]="tab.selected ? 'tab-button-color' : ''"
+                                    *ngIf="tab.is_active && i>=4" (click)="displayComponent(tab.id)">
+                                    <div class="row">
+                                        <div class="col-8 pt-1">{{tab.name}}</div>
+                                        <div class="col-1 pt-0">
+                                            <mat-icon class="smallCardIcons pt-1" style="cursor:pointer;"
+                                                (click)="removeTab(i)">close</mat-icon>
+                                        </div>
+                                    </div>
+                                </button>
+                            </div>
+                        </mat-menu>
+
+                        <mat-icon class="smallCardIcons mt-1 ml-1" [matMenuTriggerFor]="menu"
+                            style="cursor: pointer;">add</mat-icon>
+                        <mat-menu #menu="matMenu">
+                            <div *ngFor="let log of logs">
+                                <button mat-menu-item (click)="addTab(log.id, 'Create')">{{log.name}}</button>
+                            </div>
+                        </mat-menu>
+                    </div>
+
+                </div>
+                <div class="col-1 pt-1">
+                    <mat-icon class="smallCardIcons" (click)="closeTabbed()" style="cursor:pointer;"
+                        matToolTip="Close">close</mat-icon>
+                    <!-- <button class="close-btn" (click)="closeTabbed()" style="cursor:pointer;" matToolTip="Close">Discard</button> -->
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-12" *ngFor="let tab of tabbed_list; let i=index; trackBy: trackTabId">
+
+            <div *ngIf="tab.tab_id==4">
+                <app-create-task [application_reference_id]="application_reference_id" [activityId]="activity_id"
+                    [application_id]="application_id" [application_name]="application_name"
+                    [governance_id]="goverance_id" [data]="formData" [mode]="tab.mode" [selected]="tab.selected ?? false"
+                    [contactList]="contactList" [customer_id]="customer_id" (customer_list)="addCustomer($event)" [createdDate]="createdDate"
+                    (edited_or_submitted)="editedOrCreated($event, i)"></app-create-task>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

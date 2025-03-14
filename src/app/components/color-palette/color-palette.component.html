@@ -1,0 +1,7 @@
+    <div class="grid">
+        <span *ngFor="let item of palatte">
+            <button [style.background-color]="item.color" mat-icon-button class="mat-elevation-z2 mr-2" (click)="setCurrentColor(item.color)">
+                <mat-icon  [style.color]="item.color=='#FFFFFF'?'#000000':'#FFFFFF'" class="current-color-check">{{(item.color==currentColor && showCurrentColor)?'check':''}}</mat-icon>
+            </button>
+        </span>
+    </div> 

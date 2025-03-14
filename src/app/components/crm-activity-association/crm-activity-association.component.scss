@@ -1,0 +1,67 @@
+.example-container {
+  width: 400px;
+  height: 150px;
+  margin: 10px;
+  border: 1px solid #555;
+}
+ 
+::ng-deep {
+  .mat-menu-panel {
+    max-width: none !important;
+  }
+
+  .mat-button-toggle-button {
+    text-align: start;
+    color: #000000 !important;
+  }
+}
+
+.mat-button-toggle-group {
+  flex-direction: column !important;
+}
+
+.mat-button-toggle-button:focus {
+  // text-align: start;
+  // color: #000000 !important;
+  outline: 0;
+}
+
+.mat-button-toggle-checked {
+  // background-color: #e0e0e0;
+  background-color: rgba(207, 0, 1, 0.4) !important;
+}
+
+.mat-drawer-inner-container {
+  // width: 100%;
+  height: auto !important;
+  // overflow: auto;
+  // -webkit-overflow-scrolling: touch;
+}
+
+// .iconbtn {
+//   background-color: #c92020;
+//   color: white !important;
+//   padding: 0 0;
+//   box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.2),
+//     0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12);
+// }
+
+.iconbtn {
+  background-color: var(--Primary-Maroon, #EE4961);
+  border-radius: 4px;
+  background: var(--Primary-Maroon, #EE4961);
+  color: var(--Neutral-White, #FFF);
+  height: 30px;
+  border: 0px;
+  border-radius: 4px;
+  font-family: "DM Sans";
+  font-weight: 500 !important;
+  line-height: 16px;
+  letter-spacing: -0.28px;
+  width: max-content;
+      
+}
+
+.icon-style{
+  font-size: 16px; margin-top: 5px;
+}
