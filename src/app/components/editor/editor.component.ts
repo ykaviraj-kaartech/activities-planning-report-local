@@ -4,6 +4,9 @@ import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, Validators } from
 import { MatMenuTrigger } from '@angular/material/menu';
 
 import { DxHtmlEditorComponent } from 'devextreme-angular';
+import { toHTML } from 'ngx-editor';
+import { toDoc } from 'ngx-editor';
+import { Editor, Toolbar } from 'ngx-editor';
 
 @Component({
   selector: 'wyswig-editor',
@@ -23,8 +26,11 @@ export class EditorComponent implements ControlValueAccessor,OnInit {
   @Input() value: any;
   @Input() required: boolean = false;
   @Input() placeholder: any = "<p style='color:#cf000190'> Double to to add title...</p>"
-  @ViewChild('editor', { static: true }) editor!: DxHtmlEditorComponent;
+  // @ViewChild('editor', { static: true }) editor!: DxHtmlEditorComponent;
   @Output() valueChange = new EventEmitter();
+
+  editor!: Editor;
+  editorFormControl = new FormControl();
 
   isBold: boolean = false;
   isItalic: boolean = false;
@@ -32,64 +38,70 @@ export class EditorComponent implements ControlValueAccessor,OnInit {
   isBulletList: boolean = false;
   isNumberedList: boolean = false;
 
-  constructor() { }
+  constructor() { 
+    this.editor = new Editor();
+  }
   ngOnInit(): void {
-    this.editorValue.patchValue(this.value)
+    // this.editorValue.patchValue(this.value)
+    this.editorFormControl.patchValue(this.value);
+    this.editorFormControl.valueChanges.subscribe(value => {
+      this.changeEvent(toHTML(value));
+    });
   }
 
   public editorValue: FormControl = new FormControl();
 
   getFormatValue(format: string) {
-    let formats = this.editor.instance.getFormat()
-    if (formats[format] != null) {
-      return !formats[format]
-    }
-    else {
-      return true
-    }
+    // let formats = this.editor.instance.getFormat()
+    // if (formats[format] != null) {
+    //   return !formats[format]
+    // }
+    // else {
+    //   return true
+    // }
   }
   // editor toolbar functions
   toggleBold() {
-    this.editor.instance.format('bold', this.getFormatValue('bold'));
+    // this.editor.instance.format('bold', this.getFormatValue('bold'));
   }
 
   toggleItalic() {
-    this.editor.instance.format('italic', this.getFormatValue('italic'));
+    // this.editor.instance.format('italic', this.getFormatValue('italic'));
   }
 
   toggleUnderline() {
 
-    this.editor.instance.format('underline', this.getFormatValue('underline'));
+    // this.editor.instance.format('underline', this.getFormatValue('underline'));
   }
 
   toggleBulletList() {
-    let format = this.editor.instance.getFormat()
-    format['list'] == 'bullet' ? this.editor.instance.format('list', false) : this.editor.instance.format('list', 'bullet')
+    // let format = this.editor.instance.getFormat()
+    // format['list'] == 'bullet' ? this.editor.instance.format('list', false) : this.editor.instance.format('list', 'bullet')
   }
 
   toggleNumberList() {
-    let format = this.editor.instance.getFormat()
-    format['list'] == 'ordered' ? this.editor.instance.format('list', false) : this.editor.instance.format('list', 'ordered')
+    // let format = this.editor.instance.getFormat()
+    // format['list'] == 'ordered' ? this.editor.instance.format('list', false) : this.editor.instance.format('list', 'ordered')
   }
 
   alignLeft() {
-    this.editor.instance.format('align', 'left');
+    // this.editor.instance.format('align', 'left');
   }
 
   alignCenter() {
-    this.editor.instance.format('align', 'center');
+    // this.editor.instance.format('align', 'center');
   }
 
   alignRight() {
-    this.editor.instance.format('align', 'right');
+    // this.editor.instance.format('align', 'right');
   }
 
   setTextColor(e: any) {
-    this.editor.instance.format('color', e);
+    // this.editor.instance.format('color', e);
   }
 
   setFillColor(e: any) {
-    this.editor.instance.format('background', e);
+    // this.editor.instance.format('background', e);
   }
 
   focused() {
@@ -99,25 +111,19 @@ export class EditorComponent implements ControlValueAccessor,OnInit {
   }
 
   isNoteEmpty(value: string) {
-    let text = this.editor.instance.getText(0, this.editor.instance.getLength());
-    if (text.trim() != '' || value.search(/<img [a-zA-Z\:\/;0-9\,\+\="\ \-\%]*>/) > -1) {
-      return false
-    }
-    return true
+    // let text = this.editor.instance.getText(0, this.editor.instance.getLength());
+    // if (text.trim() != '' || value.search(/<img [a-zA-Z\:\/;0-9\,\+\="\ \-\%]*>/) > -1) {
+    //   return false
+    // }
+    // return true
   }
 
   public changed(value: any){}
   public touched(){}
 
   changeEvent(e: any) {
-    let text = this.editor.instance.getText(0, this.editor.instance.getLength());
-    if (!this.isNoteEmpty(e))
-      this.editorValue.setValue(e);
-    else
-      this.editorValue.setValue('');
-
     this.changed(this.editorValue.value)
-    this.valueChange.emit();
+    this.valueChange.emit(e);
   }
 
 

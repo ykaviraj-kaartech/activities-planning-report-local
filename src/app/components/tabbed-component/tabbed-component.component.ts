@@ -31,6 +31,7 @@ export class TabbedComponentComponent implements OnInit, OnChanges {
   createdDate: any;
   goverance_id: any;
   application_name!: string;
+  masterData: any;
 
   display_dropdown: boolean = false;
   uniq_id = 0;
@@ -121,6 +122,7 @@ export class TabbedComponentComponent implements OnInit, OnChanges {
     this.application_id = this.data.application_id
     this.formData = this.data.formData;
     this.createdDate = this.data.createdDate;
+    this.masterData = this.data.masterData;
     if (this.data.mode != 'Create') {
       this.activity_id = this.formData.id
     }
@@ -262,5 +264,6 @@ export interface DialogData {
   customer_id: any;
   application_id: any;
   formData?: any,
-  createdDate?: any
+  createdDate?: any,
+  masterData?: any
 }

@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 import jwt_decode from 'jwt-decode';
 import * as _ from 'underscore'
 import { PublicClientApplication } from '@azure/msal-browser';
+import { StateProvider } from '@bryntum/gantt';
 
 @Injectable({
   providedIn: 'root'
@@ -60,45 +61,65 @@ export class ActivitiesPlanningReportService {
   ];
   userSuggestions: any = [];
 
-  token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFyYWtlc2hyYWpAa2FhcnRlY2guY29tIiwidWFkIjoia3RnbG9iYWwiLCJ0aWQiOiJhMTU3Y2VlYS01MGViLTQyMGMtaWVhOS1kNDMxMGVjNTBlZjkiLCJ1cG4iOiJhcmFrZXNocmFqQGthYXJ0ZWNoLmNvbSIsIm9pZCI6IjE4MTM5MTllLWNlM2UtNGY2Zi04MjBjLTYyN2FhYzFkYTBiYiIsImFpZCI6MTc3NiwibmFtZSI6IlJha2VzaHJhaiBBIiwiaXNPMzY1IjpmYWxzZSwiaXNHc2lnbiI6ZmFsc2UsImlhdCI6MTc0MDM4OTQyNiwiZXhwIjoyNjQwMzg5NDI2fQ.Wzf_4f3yJ-ng7X2KN2QeOyUXrS36srKDQ4h23y8Pmy8';
+  slicerData: any;
+  filterConfigService: any;
+
+  token = localStorage.getItem('JWT_TOKEN');
+  hostnameGlobal = window.location.hostname;
 
   constructor(private http: HttpClient) { }
 
-  getActivitiesDataForGanttForId(tab: any, applicationId: any) {
+  getActivitiesDataForGanttForId(tab: any, applicationId: any, startDate: any, endDate: any) {
+    let hostname = this.hostnameGlobal;
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       Authorization: `Bearer ${this.token}`,
     });
+    if (this.hostnameGlobal === 'localhost') {
+      hostname = 'localhost:3011';
+    }
 
-    let apiUrl = 'http://localhost:3011/api/opportunitiesV2/getActivitiesDataForGanttForId';
+    let apiUrl = `http://${hostname}/api/opportunitiesV2/getActivitiesDataForGanttForId`;
     return this.http.post<{ messData: any[], messText: any, messType: any }>(apiUrl, {
       tab: tab,
-      applicationId: applicationId
+      applicationId: applicationId,
+      startDate: startDate,
+      endDate: endDate
     },
     { headers })
   }
 
-  getActivitiesDataForGantt(tab: any, opportunityId: any) {
+  getActivitiesDataForGantt(tab: any, opportunityId: any, startDate: any, endDate: any) {
+    let hostname = this.hostnameGlobal;
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       Authorization: `Bearer ${this.token}`,
     });
+    if (this.hostnameGlobal === 'localhost') {
+      hostname = 'localhost:3011';
+    }
 
-    let apiUrl = 'http://localhost:3011/api/opportunitiesV2/getActivitiesDataForGantt';
+    let apiUrl = `http://${hostname}/api/opportunitiesV2/getActivitiesDataForGantt`;
     return this.http.post<{ messData: any[], messText: any, messType: any }>(apiUrl, {
       tab: tab,
-      opportunity_id: opportunityId
+      opportunity_id: opportunityId,
+      startDate: startDate,
+      endDate: endDate
     },
     { headers })
   }
 
   updateActivityDates(activityId: any, start_date: any, end_date: any) {
+    let hostname = this.hostnameGlobal;
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       Authorization: `Bearer ${this.token}`,
     });
+    if (this.hostnameGlobal === 'localhost') {
+      hostname = 'localhost:3011';
+    }
 
-    let apiUrl = 'http://localhost:3011/api/opportunitiesV2/updateActivityDatesFromGantt';
+    let apiUrl = `http://${hostname}/api/opportunitiesV2/updateActivityDatesFromGantt`;
     return this.http.post<{ messData: any[], messText: any, messType: any }>(apiUrl, {
       activity_id: activityId,
       start_date: start_date,
@@ -107,14 +128,35 @@ export class ActivitiesPlanningReportService {
     { headers })
   }
 
-  async getUserProfileFromDB(oid: any) {
+  deleteActivity(activityId: any) {
+    let hostname = this.hostnameGlobal;
     const headers = new HttpHeaders({
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.token}`,
-        });
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.token}`,
+    });
+    if (this.hostnameGlobal === 'localhost') {
+      hostname = 'localhost:3011';
+    }
+
+    let apiUrl = `http://${hostname}/api/opportunitiesV2/deleteActivity`;
+    return this.http.post(apiUrl, {
+      activityId: activityId
+    },
+    { headers })
+  }
+
+  async getUserProfileFromDB(oid: any) {
+    let hostname = this.hostnameGlobal;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.token}`,
+    });
+    if (this.hostnameGlobal === 'localhost') {
+      hostname = 'localhost:3001';
+    }
     try {
       return await firstValueFrom(
-        this.http.post("http://localhost:3001/api/project/getUserProfileFromDB", { oid },
+        this.http.post(`http://${hostname}/api/project/getUserProfileFromDB`, { oid },
           { headers }
         )
       );
@@ -125,13 +167,17 @@ export class ActivitiesPlanningReportService {
   }
 
   async getUserProfileImage(oid: any){
+    let hostname = this.hostnameGlobal;
     const headers = new HttpHeaders({
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.token}`,
-        });
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.token}`,
+    });
+    if (this.hostnameGlobal === 'localhost') {
+      hostname = 'localhost:3800';
+    }
     try {
       return await firstValueFrom(
-        this.http.post("http://localhost:3001/api/auth/authenticate/getUserProfileImage", { oid },
+        this.http.post(`http://${hostname}/api/auth/authenticate/getUserProfileImage`, { oid },
           { headers }
         )
       );
@@ -142,13 +188,17 @@ export class ActivitiesPlanningReportService {
   };
 
   async taskFormDetails(activity_id: any) {
+    let hostname = this.hostnameGlobal;
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       Authorization: `Bearer ${this.token}`,
     });
+    if (this.hostnameGlobal === 'localhost') {
+      hostname = 'localhost:3011';
+    }
     try {
       return await firstValueFrom(
-        this.http.post("http://localhost:3011/api/opportunitiesV2/taskFormDetailsForOpportunity", { activity_id },
+        this.http.post(`http://${hostname}/api/opportunitiesV2/taskFormDetailsForOpportunity`, { activity_id },
           { headers }
         )
       );
@@ -159,13 +209,17 @@ export class ActivitiesPlanningReportService {
   }
 
   async getContactListForAccount(customer_id: any){
+    let hostname = this.hostnameGlobal;
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       Authorization: `Bearer ${this.token}`,
     });
+    if (this.hostnameGlobal === 'localhost') {
+      hostname = 'localhost:3011';
+    }
     try {
       return await firstValueFrom(
-        this.http.post("http://localhost:3011/api/contacts/getContactForAccount", {accountId: customer_id},
+        this.http.post(`http://${hostname}/api/contacts/getContactForAccount`, {accountId: customer_id},
           { headers }
         )
       );
@@ -176,13 +230,17 @@ export class ActivitiesPlanningReportService {
   }
 
   async getActivitiesType() {
+    let hostname = this.hostnameGlobal;
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       Authorization: `Bearer ${this.token}`,
     });
+    if (this.hostnameGlobal === 'localhost') {
+      hostname = 'localhost:3011';
+    }
     try {
       return await firstValueFrom(
-        this.http.post("http://localhost:3011/api/activity/getActivitiesType",{},
+        this.http.post(`http://${hostname}/api/activity/getActivitiesType`,{},
           { headers }
         )
       );
@@ -216,7 +274,8 @@ export class ActivitiesPlanningReportService {
   }
 
   getProfile() {
-    let token = localStorage.getItem(this.JWT_TOKEN);
+    // let token = localStorage.getItem(this.JWT_TOKEN);
+    let token = this.token;
     if (token) {
       var decoded = jwt_decode(token) as any;
       return {
@@ -246,12 +305,16 @@ export class ActivitiesPlanningReportService {
   }
 
   getUserLabel() {
+    let hostname = this.hostnameGlobal;
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       Authorization: `Bearer ${this.token}`,
     });
+    if (this.hostnameGlobal === 'localhost') {
+      hostname = 'localhost:3011';
+    }
     try {
-      return this.http.post("http://localhost:3011/api/contacts/getContactForAccount", {}, { headers });
+      return this.http.post(`http://${hostname}/api/contacts/getContactForAccount`, {}, { headers });
     } catch (err) {
       console.error("Error fetching user profile:", err);
       throw err;
@@ -267,35 +330,223 @@ export class ActivitiesPlanningReportService {
   });
 
   getGovernanceType=(applicationId: any)=>{
-    return this.http.post('http://localhost:3011/api/activity/getGovernanceActivityType', {
+    let hostname = this.hostnameGlobal;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.token}`,
+    });
+    if (this.hostnameGlobal === 'localhost') {
+      hostname = 'localhost:3011';
+    }
+    return this.http.post(`http://${hostname}/api/activity/getGovernanceActivityType`, {
       applicationId:applicationId
-    })
+    },
+    { headers }
+  )
   }
 
   getActivityPhase = (oppId: any) => {
-    return this.http.post("http://localhost:3011/api/upload/getPhaseMasterForCreation", {
+    let hostname = this.hostnameGlobal;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.token}`,
+    });
+    if (this.hostnameGlobal === 'localhost') {
+      hostname = 'localhost:3011';
+    }
+    return this.http.post(`http://${hostname}/api/opportunity/getPhaseMasterForCreation`, {
       opportunityId: oppId,
       application_id: 36
-    })
+    },
+    { headers }
+  )
+  }
+
+  getMasterOpportunitiesList = () => {
+    let hostname = this.hostnameGlobal;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.token}`,
+    });
+    if (this.hostnameGlobal === 'localhost') {
+      hostname = 'localhost:3011';
+    }
+    return this.http.post(`http://${hostname}/api/opportunitiesV2/getMasterOpportunitiesList`, {
+    },
+    { headers }
+  )
   }
 
   editCRMActivities(activity_id: any, crmFormDetails: any, application_id: any, associations: any, type_id: any) {
-    return this.http.post("http://localhost:3011/api/activity/editCRMActivities", { 
+    let hostname = this.hostnameGlobal;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.token}`,
+    });
+    if (this.hostnameGlobal === 'localhost') {
+      hostname = 'localhost:3011';
+    }
+    return this.http.post(`http://${hostname}/api/activity/editCRMActivities`, { 
       activity_id, 
       crmFormDetails, 
       application_id,
       associations, 
       type_id 
-    });
+    },
+    { headers }
+  );
   }
 
   createCRMActivities(crmFormDetails: any, application_id: any, associations: any, type_id: any) {
-    return this.http.post('http://localhost:3011/api/activity/createCRMActivities', {
+    let hostname = this.hostnameGlobal;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.token}`,
+    });
+    if (this.hostnameGlobal === 'localhost') {
+      hostname = 'localhost:3011';
+    }
+    return this.http.post(`http://${hostname}/api/opportunitiesV2/createCRMActivities`, {
       crmFormDetails: crmFormDetails,
       application_id: application_id,
       associations: associations,
       type_id: type_id
-    })
+    },
+    { headers })
+  }
+
+  // getUserSuggestions(text: any) {
+  //   return new Promise(async (resolve, reject) => {
+  //     let url =
+  //       "https://graph.microsoft.com/v1.0/users?$top=5&$filter=startswith(displayName,'" +
+  //       text +
+  //       "') or startswith(givenName,'" +
+  //       text +
+  //       "') or startswith(surname,'" +
+  //       text +
+  //       "') or startswith(mail,'" +
+  //       text +
+  //       "') or startswith(userPrincipalName,'" +
+  //       text +
+  //       "')";
+  //     this.http
+  //       .get(url, {
+  //         headers: new HttpHeaders({
+  //           Authorization: 'Bearer ' + this.token,
+  //         }),
+  //       })
+  //       .subscribe(
+  //         (res: any) => {
+  //           _.each(res.value, (v, index) => {
+  //             res.value[index].role = '';
+  //           });
+  //           this.userSuggestions = res.value;
+  //           return resolve(this.userSuggestions);
+  //         },
+  //         (err) => {
+  //           console.log(err);
+  //           return reject();
+  //         }
+  //       );
+  //   });
+  // }
+
+  getUserSuggestions(text: string): Promise<any> {
+    const url = `https://graph.microsoft.com/v1.0/users?$top=5&$filter=startswith(displayName,'${text}')
+      or startswith(givenName,'${text}')
+      or startswith(surname,'${text}')
+      or startswith(mail,'${text}')
+      or startswith(userPrincipalName,'${text}')`;
+  
+    return firstValueFrom(
+      this.http.get(url, {
+        headers: new HttpHeaders({
+          Authorization: 'Bearer ' + this.token,
+        }),
+      })
+    )
+      .then((res: any) => {
+        res.value.forEach((v: any) => {
+          v.role = '';
+        });
+        this.userSuggestions = res.value;
+        return this.userSuggestions;
+      })
+      .catch((err) => {
+        console.error(err);
+        throw err;
+      });
+  }
+
+  // async getUserProfile(id: any) {
+  //   const url = 'https://graph.microsoft.com/v1.0/users/' + id;
+  //   try {
+  //     const profile = await this.http
+  //       .get(url, {
+  //         headers: new HttpHeaders({
+  //           Authorization: 'Bearer ' + this.token,
+  //         }),
+  //       })
+  //       .toPromise();
+  //     return Promise.resolve(profile);
+  //   } catch (err) {
+  //     return Promise.reject();
+  //   }
+  // }
+  async getUserProfile(id: any): Promise<any> {
+    const url = `https://graph.microsoft.com/v1.0/users/${id}`;
+    try {
+      return await firstValueFrom(
+        this.http.get(url, {
+          headers: new HttpHeaders({
+            Authorization: `Bearer ${this.token}`,
+          }),
+        })
+      );
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  }
+
+  // async getUserSuggestionsFromDB(text: any) {
+  //   try {
+
+  //     return new Promise((resolve, reject) => {
+  //       this.http
+  //         .post("https://${this.hostname}/api/project/getUserSuggestionsFromDB", { searchText: text })
+  //         .subscribe(
+  //           res => {
+  //             return resolve(res);
+  //           },
+  //           err => {
+  //             console.log(err);
+  //             return reject(err);
+  //           }
+  //         );
+  //     });
+  //   } catch (err) {
+  //     return Promise.reject();
+  //   }
+  // }
+  async getUserSuggestionsFromDB(text: any): Promise<any> {
+    let hostname = this.hostnameGlobal;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.token}`,
+    });
+    if (this.hostnameGlobal === 'localhost') {
+      hostname = 'localhost:3001';
+    }
+    try {
+      return await firstValueFrom(
+        this.http.post(`http://${hostname}/api/project/getUserSuggestionsFromDB`, { searchText: text },
+          { headers })
+      );
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
   }
 
   // getActivitiesDataForGanttForId(applicationId: any){

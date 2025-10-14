@@ -19,6 +19,7 @@ export class UserProfileComponent implements OnInit {
   @Input() project_id: string | undefined;
   @Input() item_id: string | undefined;
   newData: any;
+  isLoading: any;
   @Output() refreshList: EventEmitter<any> = new EventEmitter<any>();
   constructor(
     // private graphApi: GraphApiService,
@@ -41,6 +42,7 @@ export class UserProfileComponent implements OnInit {
   async getUserProfile() {
     if (this.oid)
       try {
+        this.isLoading = true;
         let userProfile = await this.getUserProfileFromDB(this.oid);
         this.profile = userProfile;
 
@@ -61,8 +63,10 @@ export class UserProfileComponent implements OnInit {
     let temp = await this.activitiesPlanningReportService.getUserProfileFromDB(oid);
     
     if (Array.isArray(temp) && temp.length > 0) {
+      this.isLoading = false;
       return temp[0]; // Now TypeScript knows it's an array
     } else {
+      this.isLoading = false;
       return "";
     }
 }

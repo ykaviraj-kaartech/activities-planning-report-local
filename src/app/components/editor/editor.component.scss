@@ -34,6 +34,12 @@
     // box-shadow: 0 0 10px #719ECE;
 }
 
+ngx-editor{
+    --ngx-editor-border-color: #a4a4a4;
+    --ngx-editor-text-color: #515965;
+    font-family: 'DM Sans';
+}
+
 mat-button-toggle{
     height: 24px;
     outline: 0;

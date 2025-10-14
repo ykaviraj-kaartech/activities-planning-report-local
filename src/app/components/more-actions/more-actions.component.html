@@ -30,18 +30,28 @@
 
 </div> -->
 <div class="more-actions-styles">
-  <div class="more-actions-button" #trigger="matMenuTrigger" [matMenuTriggerFor]="menu"
-    (click)="trigger.openMenu()">
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
-      <g id="Group">
-        <path id="Vector"
-          d="M10 2.5C9.3125 2.5 8.75 3.0625 8.75 3.75C8.75 4.4375 9.3125 5 10 5C10.6875 5 11.25 4.4375 11.25 3.75C11.25 3.0625 10.6875 2.5 10 2.5ZM10 15C9.3125 15 8.75 15.5625 8.75 16.25C8.75 16.9375 9.3125 17.5 10 17.5C10.6875 17.5 11.25 16.9375 11.25 16.25C11.25 15.5625 10.6875 15 10 15ZM10 8.75C9.3125 8.75 8.75 9.3125 8.75 10C8.75 10.6875 9.3125 11.25 10 11.25C10.6875 11.25 11.25 10.6875 11.25 10C11.25 9.3125 10.6875 8.75 10 8.75Z"
-          fill="#B9C0CA" />
-      </g>
-    </svg>
-  </div>
+	<div *ngIf="column?.is_activity !== true && column?.is_activity !== 1">
+		<div (click)="onCreate()" matTooltip="Create Task" style="cursor: pointer;">
+			<svg xmlns="http://www.w3.org/2000/svg" width="20" height="21" viewBox="0 0 20 21" fill="none">
+				<g id="Group">
+				<path id="Vector" d="M9.16406 9.66699V6.33366H10.8307V9.66699H14.1641V11.3337H10.8307V14.667H9.16406V11.3337H5.83073V9.66699H9.16406ZM9.9974 18.8337C5.3949 18.8337 1.66406 15.1028 1.66406 10.5003C1.66406 5.89783 5.3949 2.16699 9.9974 2.16699C14.5999 2.16699 18.3307 5.89783 18.3307 10.5003C18.3307 15.1028 14.5999 18.8337 9.9974 18.8337ZM9.9974 17.167C11.7655 17.167 13.4612 16.4646 14.7114 15.2144C15.9617 13.9641 16.6641 12.2684 16.6641 10.5003C16.6641 8.73222 15.9617 7.03652 14.7114 5.78628C13.4612 4.53604 11.7655 3.83366 9.9974 3.83366C8.22929 3.83366 6.53359 4.53604 5.28335 5.78628C4.03311 7.03652 3.33073 8.73222 3.33073 10.5003C3.33073 12.2684 4.03311 13.9641 5.28335 15.2144C6.53359 16.4646 8.22929 17.167 9.9974 17.167Z" fill="#A8ACB2"/>
+				</g>
+			</svg>
+		</div>
+	</div>
+	<div *ngIf="column?.is_activity == true || column?.is_activity == 1">
+		<div class="more-actions-button" #trigger="matMenuTrigger" [matMenuTriggerFor]="menu"
+		  (click)="trigger.openMenu()">
+		  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+			<g id="Group">
+			  <path id="Vector"
+				d="M10 2.5C9.3125 2.5 8.75 3.0625 8.75 3.75C8.75 4.4375 9.3125 5 10 5C10.6875 5 11.25 4.4375 11.25 3.75C11.25 3.0625 10.6875 2.5 10 2.5ZM10 15C9.3125 15 8.75 15.5625 8.75 16.25C8.75 16.9375 9.3125 17.5 10 17.5C10.6875 17.5 11.25 16.9375 11.25 16.25C11.25 15.5625 10.6875 15 10 15ZM10 8.75C9.3125 8.75 8.75 9.3125 8.75 10C8.75 10.6875 9.3125 11.25 10 11.25C10.6875 11.25 11.25 10.6875 11.25 10C11.25 9.3125 10.6875 8.75 10 8.75Z"
+				fill="#B9C0CA" />
+			</g>
+		  </svg>
+		</div>
+	</div>
 	
-	<!-- Custom Context Menu -->
 	<!-- <ng-template #menuTemplate>
 		<div class="custom-menu">
 			<button class="menu-item" (click)="onEdit()">Edit</button>
@@ -51,17 +61,39 @@
 	</ng-template> -->
 
 	<mat-menu #menu="matMenu">
-		<div class="card">
-			<div class="card-body">
-				<button mat-menu-item (click)="onEdit()">
-					
-					<span>
-						Edit
-					</span>
-				</button>
-				<button mat-menu-item (click)="onDelete()">Delete</button>
-			</div>
-		</div>
+		<!-- <div class="card"> -->
+			<!-- <div class="card-body"> -->
+				<div *ngIf="column?.is_activity == true || column?.is_activity == 1">
+					<button mat-menu-item (click)="onEdit()">
+						<span class="mr-1">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 12 12" fill="none">
+								<path opacity="0.8" d="M6.55983 2.84362L9.15638 5.44078L3.09655 11.5H0.5V8.90284L6.55983 2.84301V2.84362ZM7.42535 1.9781L8.72362 0.679216C8.83841 0.564464 8.99407 0.5 9.15638 0.5C9.31869 0.5 9.47435 0.564464 9.58914 0.679216L11.3208 2.41086C11.4355 2.52565 11.5 2.68131 11.5 2.84362C11.5 3.00593 11.4355 3.16159 11.3208 3.27638L10.0219 4.57465L7.42535 1.9781Z" fill="#8B95A5"/>
+							</svg>
+						</span>
+						<span class="action-text">
+							Edit
+						</span>
+					</button>
+					<button mat-menu-item (click)="onDelete()">
+						<span class="mr-1">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 10 12" fill="none">
+								<path d="M1.875 12C1.53125 12 1.23698 11.8694 0.992188 11.6083C0.747396 11.3472 0.625 11.0333 0.625 10.6667V2H0V0.666667H3.125V0H6.875V0.666667H10V2H9.375V10.6667C9.375 11.0333 9.2526 11.3472 9.00781 11.6083C8.76302 11.8694 8.46875 12 8.125 12H1.875ZM3.125 9.33333H4.375V3.33333H3.125V9.33333ZM5.625 9.33333H6.875V3.33333H5.625V9.33333Z" fill="#A2AAB7"/>
+							</svg>
+						</span>
+						<span class="action-text">
+							Delete
+						</span>
+					</button>
+				</div>
+				<div *ngIf="column?.is_activity !== true && column?.is_activity !== 1">
+					<button mat-menu-item (click)="onCreate()">
+						<span class="action-text">
+							Create
+						</span>
+					</button>
+				</div>
+			<!-- </div> -->
+		<!-- </div> -->
 	</mat-menu>
 
 </div>

@@ -91,4 +91,181 @@ app-gantt {
 .planning-landing-page-styles{
     height: 100%;
     width: 100%;
+
+    .button-group {
+        display: flex;
+          /* gap: 10px; */
+          background: #fff;
+          border-radius: 20px;
+          padding: 5px;
+          height: 42px;
+          border: 1px solid #E8E9EE;
+          width: fit-content;
+      }
+      
+      .button-group button {
+        display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: 0.3s;
+            background: #fff;
+      }
+      
+      .inr-button {
+        color: #526179;
+      }
+      
+      .usd-button {
+        color: #526179;
+      }
+      
+      .active {
+        // background: white;
+        color: #e63946;
+        // box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      
+      .date-picker-container{
+        display: flex;
+        cursor: pointer;
+      }
+      .popover-container {
+        padding: 12px;
+        width: 150px; /* Adjust width for proper spacing */
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        margin-top: 40px;
+      }
+      
+      .year-navigation {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+      }
+      
+      .year-label {
+        font-size: 18px;
+        font-weight: bold;
+        color: #2c3e50;
+      }
+      
+      .month-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr); /* 4 columns per row */
+        gap: 12px; /* Spacing between buttons */
+        padding: 10px 0;
+      }
+      
+      .month-grid button {
+        padding: 10px;
+        border: none;
+        border-radius: 20px;
+        text-align: center;
+        cursor: pointer;
+        font-size: 14px;
+        color: #bbb; /* Default color for inactive months */
+        background: transparent;
+        transition: 0.3s ease;
+      }
+      
+      .month-grid button.current {
+        background-color: #e74c3c;
+        color: white;
+        font-weight: bold;
+      }
+      
+      .month-grid button:hover {
+        background-color: #ddd;
+      }
+      
+      .month-grid button.selected {
+        background-color: #e74c3c;
+        color: white;
+        font-weight: bold;
+      }
+
+    .open-popup-button{
+        cursor: pointer;
+        color: var(--Blue-Grey-90, #526179);
+        font-family: "DM Sans";
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal;
+    }
+
+    ::ng-deep .popover-container {
+        position: relative;
+        padding: 12px;
+        width: 16rem;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        font-family: 'DM Sans';
+      }
+      
+      ::ng-deep .year-navigation {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+      }
+      
+      ::ng-deep .year-label {
+        font-size: 13px;
+        font-weight: 500;
+        color: #45546E;
+      }
+      
+      ::ng-deep .month-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10%;
+        padding: 10px 0 10px 10px;
+      }
+      
+      ::ng-deep .month-grid button {
+        border: none;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        font-size: 13px;
+        border-radius: 12px;
+        text-align: center;
+        cursor: pointer;
+        width: 35px;
+        height: 24px;
+        transition: 0.3s ease;
+      }
+
+      .create-task-btn {
+        border: none;
+        // padding: 3px 5px 3px 5px;
+        height: 30px;
+        border-radius: 4px;
+        background: var(--Primary-Maroon, #EE4961);
+        color: var(--Neutral-White, #FFF);
+        font-family: "DM Sans";
+        font-weight: 500;
+        line-height: 16px;
+        letter-spacing: -0.28px;
+        white-space: nowrap;
+        text-align: center;
+      }
+
+      .current-tab-heading{
+        color: #272A47;
+        font-family: "DM Sans";
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 500;
+        text-transform: capitalize;
+      }
 }

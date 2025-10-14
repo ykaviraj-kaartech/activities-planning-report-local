@@ -12,6 +12,7 @@ import { GanttChartComponent } from './components/gantt-chart/gantt-chart.compon
 import { FormsModule } from '@angular/forms';
 import { UserImageComponent } from './components/user-image/user-image.component';
 import { UserProfileComponent } from './components/user-profile/user-profile.component';
+import { SlicerOppComponent } from './components/slicer-opp/slicer-opp.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule, MAT_MENU_DEFAULT_OPTIONS } from '@angular/material/menu';
@@ -39,6 +40,11 @@ import { provideMomentDateAdapter } from '@angular/material-moment-adapter';
 import { MatInputModule } from '@angular/material/input';
 import { ColorPaletteComponent } from './components/color-palette/color-palette.component';
 import { EditorComponent } from './components/editor/editor.component';
+import { SatPopoverModule } from "@ncstate/sat-popover";
+import { SearchUserComponent } from './components/search-user/search-user.component'
+import { MatAutocompleteModule } from "@angular/material/autocomplete";
+import { DevExtremeModule } from 'devextreme-angular';
+import { NgxEditorModule } from 'ngx-editor';
 
 @NgModule({
   declarations: [
@@ -55,6 +61,8 @@ import { EditorComponent } from './components/editor/editor.component';
     ValueArrayPipe,
     ColorPaletteComponent,
     EditorComponent,
+    SearchUserComponent,
+    SlicerOppComponent
   ],
   imports: [
     BrowserModule,
@@ -80,7 +88,11 @@ import { EditorComponent } from './components/editor/editor.component';
     MatOptionModule,
     NgxMatSelectSearchModule,
     CommonModule,
-    MatInputModule
+    MatInputModule,
+    SatPopoverModule,
+    MatAutocompleteModule,
+    DevExtremeModule,
+    NgxEditorModule
   ],
   providers: [provideHttpClient(),
     provideMomentDateAdapter(),

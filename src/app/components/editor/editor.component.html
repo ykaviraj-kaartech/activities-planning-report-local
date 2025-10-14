@@ -1,5 +1,14 @@
-<dx-html-editor #editor class="editor-body" [value]="editorValue.value" (valueChange)="changeEvent($event)"></dx-html-editor>
-<div class="container-fluid">
+<!-- <dx-html-editor #editor class="editor-body" [value]="editorValue.value" (valueChange)="changeEvent($event)"></dx-html-editor> -->
+<!-- <div
+    #editor
+    class="editor-body"
+    contenteditable="true"
+    [value]="editorValue.value"
+    (input)="changeEvent($event)"
+></div> -->
+<!-- <ngx-editor [formControl]="editorValue"></ngx-editor> -->
+<ngx-editor [editor]="editor" (valueChange)="changeEvent($event)" [formControl]="editorFormControl"></ngx-editor>
+<!-- <div class="container-fluid">
     <div class="editor-toolbar row justify-content-center">    
         <button mat-button (click)="toggleBold()">
             <mat-icon class="toolbar-icon">format_bold</mat-icon>
@@ -25,7 +34,6 @@
     	<button mat-button (click)="alignRight()">
             <mat-icon class="toolbar-icon">format_align_right</mat-icon>
         </button>
-        <!-- Text color Menu -->
         <button  mat-button [matMenuTriggerFor]="textColorPalatte">
             <mat-icon class="toolbar-icon">format_color_text</mat-icon>
         </button>
@@ -43,4 +51,4 @@
             </span>
         </mat-menu>
     </div>
-</div>
+</div> -->

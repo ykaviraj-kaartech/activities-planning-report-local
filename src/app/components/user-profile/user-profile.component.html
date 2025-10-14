@@ -48,8 +48,14 @@
   <div *ngIf="type == 'small'">
     <div class="d-flex flex-row pb-2 pb-lg-0 px-0 flex-nowrap">
       <app-user-image class="my-auto pr-1" [id]="oid" imgWidth="24px" imgHeight="24px"></app-user-image>
-      <p class="text-overflow m-0 data-label pl-1">
+      <p *ngIf="profile?.displayName" class="text-overflow m-0 data-label pl-1">
         {{ profile?.displayName }}
+      </p>
+      <p *ngIf="!profile?.displayName && isLoading" class="text-overflow m-0 data-label pl-1">
+        Loading
+      </p>
+      <p *ngIf="!profile?.displayName && !isLoading" class="text-overflow m-0 data-label pl-1">
+        Exited User
       </p>
     </div>
   </div>

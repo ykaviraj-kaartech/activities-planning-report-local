@@ -27,6 +27,7 @@ export class CreateTaskComponent implements OnInit, OnChanges {
   @Input() selected: boolean = false;
   @Input() contactList: any;
   @Input() createdDate: any;
+  @Input() masterData: any;
 
   @Output() edited_or_submitted = new EventEmitter();
   contactGovernanceTypes: any;
@@ -44,6 +45,7 @@ export class CreateTaskComponent implements OnInit, OnChanges {
   accountInfo: any;
   updatedActivityCount: number | undefined;
   assocConfig: any;
+  // masterOpportunitiesList: any;
 
   constructor(
     private fb: FormBuilder,
@@ -55,7 +57,7 @@ export class CreateTaskComponent implements OnInit, OnChanges {
     this.taskForm = this.fb.group({
       title: ['', Validators.required],
       description: [''],
-      assignedTo: ["", Validators.required],
+      assignedTo: ['', Validators.required],
       // createdBy: ['', Validators.required],
       startDate: [null as string | Date | null, Validators.required],
       endDate: [null as string | Date | null, Validators.required],
@@ -64,34 +66,12 @@ export class CreateTaskComponent implements OnInit, OnChanges {
       application_reference_id: [''],
       applicationId: [''],
       governanceType: [null as string | number | null],
-      phase: [null as string | number | null]
+      phase: [null as string | number | null],
     });
   }
 
   ngOnChanges() {
-    console.log('ngOnChanges called');
-    // this.taskForm = this.fb.group({
-    //   title: ['', Validators.required],
-    //   description: [''],
-    //   assignedTo: ["", Validators.required],
-    //   // createdBy: ['', Validators.required],
-    //   startDate: [null as string | Date | null, Validators.required],
-    //   endDate: [null as string | Date | null, Validators.required],
-    //   remindMe: [''],
-    //   applicationName: [''],
-    //   application_reference_id: [''],
-    //   applicationId: [''],
-    //   governanceType: [null as string | number | null],
-    //   phase: [null as string | number | null]
-    // });
-    if (this.mode == 'Edit') {
-      this.updateFormWithTaskDetails();
-      this.assocConfig = {
-        appId: this.application_id,
-        elementId: this.application_reference_id,
-        activityAssociation: this.activityAssociation
-      }
-    }
+
   }
 
   updateFormWithTaskDetails() {
@@ -123,7 +103,6 @@ export class CreateTaskComponent implements OnInit, OnChanges {
           application_reference_id: this.application_reference_id,
           phase: res['phase_id'] ? parseInt(res['phase_id']) : null
         })
-        console.log('test for this.taskForm', this.taskForm);
 
       }
       else
@@ -138,22 +117,7 @@ export class CreateTaskComponent implements OnInit, OnChanges {
     this.activityAssociation = assocData
   }
 
-  ngOnInit() {
-    console.log('ngOnInit called');
-    // this.taskForm = this.fb.group({
-    //   title: ['', Validators.required],
-    //   description: [''],
-    //   assignedTo: ["", Validators.required],
-    //   // createdBy: ['', Validators.required],
-    //   startDate: [null as string | Date | null, Validators.required],
-    //   endDate: [null as string | Date | null, Validators.required],
-    //   remindMe: [''],
-    //   applicationName: [''],
-    //   application_reference_id: [''],
-    //   applicationId: [''],
-    //   governanceType: [null as string | number | null],
-    //   phase: [null as string | number | null]
-    // });
+  ngOnInit() {    
 
     this.currentUser = this.activitiesPlanningReportService.getProfile()?.profile;
 
@@ -228,6 +192,15 @@ export class CreateTaskComponent implements OnInit, OnChanges {
       })
     }
 
+    // this.activitiesPlanningReportService.getMasterOpportunitiesList().subscribe({
+    //   next: (response) => {
+    //     this.masterOpportunitiesList = response
+    //   },
+    //   error: (error) => {
+    //     console.log(error);
+    //   }
+    // });
+
   }
 
 
@@ -292,7 +265,10 @@ export class CreateTaskComponent implements OnInit, OnChanges {
           this.snackBar.open("Task updated Successfully!", "Dismiss", { duration: 2000 })
 
           this.edited_or_submitted.emit("Edited");
-          this.dialogRef.close('update required');
+          this.dialogRef.close({
+            text: 'update required',
+            newData: this.taskForm.value
+          });
         },
         error: (error) => {
           this.snackBar.open("Failed to edit task.", "Dismiss", { duration: 2000 })
@@ -314,7 +290,10 @@ export class CreateTaskComponent implements OnInit, OnChanges {
             this.snackBar.open("Task Created Successfully!", "Dismiss", { duration: 2000 })
 
             this.edited_or_submitted.emit("Created");
-            this.dialogRef.close('update required');
+            this.dialogRef.close({
+              text: 'update required',
+              newData: this.taskForm.value
+            });
           },
           error: (error: any) => {
             this.snackBar.open("Failed to create task.", "Dismiss", { duration: 2000 })
@@ -329,7 +308,10 @@ export class CreateTaskComponent implements OnInit, OnChanges {
           this.snackBar.open("Task Created Successfully!", "Dismiss", { duration: 2000 })
           
           this.edited_or_submitted.emit("Created");
-          this.dialogRef.close('update required');
+          this.dialogRef.close({
+            text: 'update required',
+            newData: this.taskForm.value
+          });
         }, (err: any) => {
           this.snackBar.open("Failed to create task.", "Dismiss", { duration: 2000 })
           this.buttonClicked = false;
@@ -342,7 +324,10 @@ export class CreateTaskComponent implements OnInit, OnChanges {
           this.snackBar.open("Task Created Successfully!", "Dismiss", { duration: 2000 })
           
           this.edited_or_submitted.emit("Created");
-          this.dialogRef.close('update required');
+          this.dialogRef.close({
+            text: 'update required',
+            newData: this.taskForm.value
+          });
         }, (err: any) => {
           this.snackBar.open("Failed to create task.", "Dismiss", { duration: 2000 })
           this.buttonClicked = false;
@@ -372,6 +357,10 @@ export class CreateTaskComponent implements OnInit, OnChanges {
       this.snackBar.open("Enter all Mandatory Fields!", "Dismiss", { duration: 2000 })
       this.buttonClicked = false;
     }
+  }
+
+  updateDescription(value: string) {
+    this.taskForm.get('description')?.patchValue(value);
   }
 
 

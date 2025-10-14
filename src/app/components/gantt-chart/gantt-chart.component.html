@@ -1,5 +1,203 @@
 <div #ganttContainer class="gantt-chart-style">
-    <bryntum-gantt
+    <div class="d-flex justify-content-between mb-3 mx-3">
+        <div class="my-auto">
+            <div class="d-flex">
+                <button class="custom-back-btn mr-3" (click)="backToReportsLandingPage()">
+                    <div style="position: relative; top: 2px">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <g id="Group">
+                            <path id="Vector" d="M7.21834 7.99999L10.5183 11.3L9.57567 12.2427L5.33301 7.99999L9.57567 3.75732L10.5183 4.69999L7.21834 7.99999Z" fill="#45546E"/>
+                            </g>
+                        </svg>
+                        Back
+                    </div>
+                </button>
+                <div class="d-flex mt-1 align-items-center" style="gap: 10px; cursor: pointer" [matMenuTriggerFor]="newitems">
+                    <div class="current-tab-heading">
+                        {{ tab }}
+                    </div>
+                    <div style="position: relative; top: -2px;" >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="8" viewBox="0 0 10 8" fill="none">
+                            <path d="M5 4.75033L8.83333 0.916992L10 2.08366L5 7.08366L0 2.08366L1.16667 0.916992L5 4.75033Z" fill="#7D838B"/>
+                        </svg>
+                    </div>
+                </div>
+                <mat-menu #newitems="matMenu" class="new-items-panel">
+                    <!-- <div class="card"> -->
+                        <!-- <div class="card-body p-0"> -->
+                        <button mat-menu-item (click)="changeTabToPeople()">
+                            <span style="font-family: DM Sans;">People</span>
+                        </button>
+                        <button mat-menu-item (click)="changeTabToOpportunities()">
+                            <span style="font-family: DM Sans;">Opportunities</span>
+                        </button>
+                        <!-- </div> -->
+                    <!-- </div> -->
+                </mat-menu>
+            </div>
+        </div>
+		<div class="d-flex align-items-center px-2" style="gap: 16px;">
+            <!-- <div>
+                <button (click)="toggleTaskNonWorkingTime()">Toggle Non-Working Time</button>
+            </div> -->
+            <div>
+                <mat-form-field appearance="outline" class="search-bar ml-auto">
+                    <span matSuffix>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26" fill="none">
+                        <g clip-path="url(#clip0_12265_94744)">
+                        <path d="M16.828 16.0782L19.6833 18.9328L18.74 19.8762L15.8853 17.0208C14.8231 17.8723 13.502 18.3354 12.1406 18.3335C8.82863 18.3335 6.14062 15.6455 6.14062 12.3335C6.14062 9.0215 8.82863 6.3335 12.1406 6.3335C15.4526 6.3335 18.1406 9.0215 18.1406 12.3335C18.1426 13.6948 17.6794 15.016 16.828 16.0782ZM15.4906 15.5835C16.3367 14.7134 16.8092 13.5471 16.8073 12.3335C16.8073 9.75483 14.7186 7.66683 12.1406 7.66683C9.56196 7.66683 7.47396 9.75483 7.47396 12.3335C7.47396 14.9115 9.56196 17.0002 12.1406 17.0002C13.3542 17.0021 14.5205 16.5296 15.3906 15.6835L15.4906 15.5835V15.5835Z" fill="#EE4961"/>
+                        </g>
+                        <defs>
+                        <clipPath id="clip0_12265_94744">
+                        <rect width="16" height="16" fill="white" transform="translate(4.80859 5)"/>
+                        </clipPath>
+                        </defs>
+                      </svg>
+                    </span>
+                    <input matInput type="text" (input)="onSearch($event)" placeholder="Search Tasks / Opportunities">
+                  </mat-form-field>
+            </div>
+
+            <div class="col-1 slicer-container" (click)="supressSlicer()">
+                <span style="color: #5F6C81;" class="material-symbols-outlined" *ngIf="!isSlicerOn">
+                    <mat-icon style="height: 18px; width: 24px;">
+                      filter_list
+                    </mat-icon>
+                </span>
+                <span style="color: #5F6C81;" class="material-symbols-outlined" *ngIf="isSlicerOn">
+                    <mat-icon style="height: 18px; width: 24px;">
+                      filter_list_off
+                    </mat-icon>
+                </span>
+            </div>
+            <div *ngIf="isResetButtonPresent">
+                <button class="reset-button" (click)="clearAllFilters()">
+                  Reset All Filters
+                </button>
+            </div> 
+
+			<div class="button-group">
+                <button 
+					mat-button 
+					(click)="toggleView('hourAndDay')" 
+					class="time-range-button" 
+					[class.active]="ganttCmp?.instance?.timeAxis?.viewPreset?.id === 'hourAndDay'"
+				>
+					<mat-icon>date_range</mat-icon> Day
+				</button>
+				<button 
+					mat-button 
+					(click)="toggleView('weekAndDayLetter')" 
+					class="time-range-button" 
+					[class.active]="ganttCmp?.instance?.timeAxis?.viewPreset?.id === 'weekAndDayLetter'"
+				>
+					<mat-icon>date_range</mat-icon> Weeks
+				</button>
+				<button 
+					mat-button 
+					(click)="toggleView('monthAndYear')" 
+					class="time-range-button" 
+					[class.active]="ganttCmp?.instance?.timeAxis?.viewPreset?.id === 'monthAndYear'"
+				>
+					<mat-icon>calendar_month</mat-icon> Months
+				</button>
+			</div>
+		
+             <!-- <div class="d-flex justify-content-between align-items-center">
+                 <mat-button class="open-popup-button" #popoverTrigger (click)="openPopover(popoverTrigger)">
+                     <svg xmlns="http://www.w3.org/2000/svg" style="margin-right: 6px; position: relative; top: -2px;" width="14" height="16" viewBox="0 0 14 16" fill="none">
+                         <path d="M4 9.49805C3.7875 9.49805 3.60938 9.42617 3.46562 9.28242C3.32187 9.13867 3.25 8.96055 3.25 8.74805C3.25 8.53555 3.32187 8.35742 3.46562 8.21367C3.60938 8.06992 3.7875 7.99805 4 7.99805C4.2125 7.99805 4.39062 8.06992 4.53438 8.21367C4.67812 8.35742 4.75 8.53555 4.75 8.74805C4.75 8.96055 4.67812 9.13867 4.53438 9.28242C4.39062 9.42617 4.2125 9.49805 4 9.49805ZM7 9.49805C6.7875 9.49805 6.60938 9.42617 6.46563 9.28242C6.32188 9.13867 6.25 8.96055 6.25 8.74805C6.25 8.53555 6.32188 8.35742 6.46563 8.21367C6.60938 8.06992 6.7875 7.99805 7 7.99805C7.2125 7.99805 7.39063 8.06992 7.53438 8.21367C7.67813 8.35742 7.75 8.53555 7.75 8.74805C7.75 8.96055 7.67813 9.13867 7.53438 9.28242C7.39063 9.42617 7.2125 9.49805 7 9.49805ZM10 9.49805C9.7875 9.49805 9.60938 9.42617 9.46563 9.28242C9.32188 9.13867 9.25 8.96055 9.25 8.74805C9.25 8.53555 9.32188 8.35742 9.46563 8.21367C9.60938 8.06992 9.7875 7.99805 10 7.99805C10.2125 7.99805 10.3906 8.06992 10.5344 8.21367C10.6781 8.35742 10.75 8.53555 10.75 8.74805C10.75 8.96055 10.6781 9.13867 10.5344 9.28242C10.3906 9.42617 10.2125 9.49805 10 9.49805ZM1.75 15.498C1.3375 15.498 0.984375 15.3512 0.690625 15.0574C0.396875 14.7637 0.25 14.4105 0.25 13.998V3.49805C0.25 3.08555 0.396875 2.73242 0.690625 2.43867C0.984375 2.14492 1.3375 1.99805 1.75 1.99805H2.5V0.498047H4V1.99805H10V0.498047H11.5V1.99805H12.25C12.6625 1.99805 13.0156 2.14492 13.3094 2.43867C13.6031 2.73242 13.75 3.08555 13.75 3.49805V13.998C13.75 14.4105 13.6031 14.7637 13.3094 15.0574C13.0156 15.3512 12.6625 15.498 12.25 15.498H1.75ZM1.75 13.998H12.25V6.49805H1.75V13.998ZM1.75 4.99805H12.25V3.49805H1.75V4.99805Z" fill="#526179"/>
+                     </svg>
+                         {{ months[selectedMonthIndex] }}
+                         {{ selectedYear }}
+                 </mat-button>
+             </div>
+			
+			<ng-template #popoverTemplate>
+				<div class="popover-container" [ngStyle]="popoverStyles">
+					<div class="year-navigation px-3" [ngStyle]="yearNavigation">
+                        <svg (click)="changeYear(-1)" style="cursor: pointer;" xmlns="http://www.w3.org/2000/svg" width="9" height="14" viewBox="0 0 9 14" fill="none">
+                            <g id="Arrow - Right 2">
+                            <path id="Stroke 1" d="M7.125 12.25L1.875 7L7.125 1.75" stroke="#526179" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </g>
+                        </svg>
+						<span class="year-label" [ngStyle]="yearLabel">{{ currentYear }}</span>
+                        <svg (click)="changeYear(1)" style="cursor: pointer;" xmlns="http://www.w3.org/2000/svg" width="9" height="14" viewBox="0 0 9 14" fill="none">
+                            <g id="Arrow - Right 2">
+                            <path id="Stroke 1" d="M1.875 1.75L7.125 7L1.875 12.25" stroke="#526179" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </g>
+                        </svg>
+					</div>
+			
+					<div class="month-grid" [ngStyle]="monthGrid">
+						<button *ngFor="let month of months; let i = index"
+										[ngStyle]="{
+											'color': i === selectedMonthIndex && currentYear === selectedYear ? 'white' : '#B9C0CA',
+											'background': i === selectedMonthIndex && currentYear === selectedYear ? '#EE4961' : 'transparent',
+											'border': 'none',
+											'border-radius': '14px',
+                                            'outline': 'none'
+										}"
+										(click)="selectMonth(i)">
+							{{ month }}
+						</button>
+					</div>
+				</div>
+			</ng-template> -->
+            <div class="d-flex align-items-center">
+                <span class="date-text">{{ startDateForData | date:'dd-MM-yyyy' }}</span>
+                <button (click)="openStartPicker($event)" style="background:none; border:none; cursor:pointer;">
+                <mat-icon>calendar_today</mat-icon>
+                </button>
+
+                <input 
+                #startInput
+                matInput 
+                [matDatepicker]="startPicker" 
+                [(ngModel)]="startDateForData" 
+                (dateChange)="onStartDateChange($event)"
+                style="position:absolute; opacity:0; width:1px; height:1px; border:none; padding:0; margin:0;" 
+                />
+
+                <mat-datepicker #startPicker></mat-datepicker>
+            </div>
+            <div>
+                <span class="date-text">to</span>
+            </div>
+            <div class="d-flex align-items-center">
+
+                <span class="date-text">{{ endDateForData | date:'dd-MM-yyyy' }}</span>
+                <button (click)="openEndPicker($event)" style="background:none; border:none; cursor:pointer;">
+                <mat-icon>calendar_today</mat-icon>
+                </button>
+
+                <input 
+                #endInput
+                matInput 
+                [matDatepicker]="endPicker" 
+                [(ngModel)]="endDateForData" 
+                (dateChange)="onEndDateChange($event)"
+                style="position:absolute; opacity:0; width:1px; height:1px; border:none; padding:0; margin:0;" 
+                />
+
+                <mat-datepicker #endPicker></mat-datepicker>
+            </div>
+
+			<button class="px-1 create-task-btn" matTooltip="Create Task" (click)="createTask()">
+				Create Task
+			</button> 
+		</div>
+	</div>
+    <div  [ngStyle]="{ visibility: isLoading == true? 'visible' : 'hidden' }">
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    </div>
+    <div *ngIf="!isSlicerLoading && isSlicerOn">
+        <app-slicer-opp style="margin-top:-2vh;" [slicerData]="slicerData" [filterConfig]="filterConfig"
+            (combinedEvent)="handleCombinedEvent($event)" (clearSlicer)="clearSlicer($event)"></app-slicer-opp>
+    </div>
+    <!-- <input type="text" (input)="onSearch($event)" placeholder="Search Tasks / Opportunities"> -->
+    <bryntum-gantt *ngIf="tab === 'Opportunities' && !isRefreshNeeded"
+        id="bryntum-gantt"
         class="bryntum-gantt"
         style="height: 80vh;"
         #gantt
@@ -8,29 +206,34 @@
         [project]                 = "ganttProps.project"
         [startDate]               = "ganttProps.startDate"
         [projectLinesFeature]     = "ganttProps.features.projectLines"
+        [scrollButtonsFeature]    = "ganttProps.features.scrollButtons"
+        [labelsFeature]           = "ganttProps.features.labels"
+        [taskTooltipFeature]      = "ganttProps.features.taskTooltip"
+        [taskEditFeature]         = "ganttProps.features.taskEdit"
+        [dependenciesFeature]     = "ganttProps.features.dependencies"
         (ready)="onGanttReady($event)"
     ></bryntum-gantt>
-</div>
-<!-- <div class="gantt-chart-style">
-    <bryntum-gantt
-    class="bryntum-gantt"
-    style="height: 80vh;"
-    #gantt
-    [columns]="ganttProps.columns"
-    [endDate]="ganttProps.endDate"
-    [project]="ganttProps.project"
-    [startDate]="ganttProps.startDate"
-    [taskNonWorkingTimeFeature]="ganttProps.features.taskNonWorkingTime"
-    [nonWorkingTimeFeature]="ganttProps.features.nonWorkingTime"
-    (ready)="onGanttReady($event)"
-></bryntum-gantt>
-</div> -->
-
-<div>
-    <button (click)="getData()">
-        Get Data
-    </button>
-    <button (click)="consoleData()">
-        Console Data
-    </button>
+    <bryntum-gantt *ngIf="tab === 'People' && !isRefreshNeeded"
+        id="bryntum-gantt"
+        class="bryntum-gantt"
+        style="height: 80vh;"
+        #gantt
+        [columns]                 = "ganttProps.columns"
+        [endDate]                 = "ganttProps.endDate"
+        [project]                 = "ganttProps.project"
+        [startDate]               = "ganttProps.startDate"
+        [projectLinesFeature]     = "ganttProps.features.projectLines"
+        [scrollButtonsFeature]    = "ganttProps.features.scrollButtons"
+        [labelsFeature]           = "ganttProps.features.labels"
+        [taskTooltipFeature]      = "ganttProps.features.taskTooltip"
+        [taskNonWorkingTimeFeature]="ganttProps.features.taskNonWorkingTime"
+        [nonWorkingTimeFeature]="ganttProps.features.nonWorkingTime"
+        [eventMenuFeature]="ganttProps.features.eventMenu"
+        [scheduleMenuFeature]="ganttProps.features.scheduleMenu"
+        [timeAxisHeaderMenuFeature]="ganttProps.features.timeAxisHeaderMenu"
+        [cellMenuFeature]="ganttProps.features.cellMenu"
+        [taskEditFeature]         = "ganttProps.features.taskEdit"
+        [dependenciesFeature]     = "ganttProps.features.dependencies"
+        (ready)="onGanttReady($event)"
+    ></bryntum-gantt>
 </div>

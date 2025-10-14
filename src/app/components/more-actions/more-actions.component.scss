@@ -20,9 +20,14 @@
         border: none;
         cursor: pointer;
     }
-
     
-}
+  }
+
+  .action-text{
+    font-family: 'DM Sans';
+    color: #526179;
+  }
+
 ::ng-deep .cdk-overlay-pane{
     position: fixed;
 }

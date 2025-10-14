@@ -1,0 +1,38 @@
+<div>
+  <mat-form-field appearance="outline">
+    <mat-label *ngIf="label && isLabelDisplay">{{ label }}</mat-label>
+    <input
+      matInput
+      [matAutocomplete]="auto"
+      [placeholder]="label"
+      (keyup)="searchUser($event)"
+      (focus)="resetSuggestion()"
+      (focusout)="checkAndClearInput()"
+      [required]="required"
+      [formControl]="fieldCtrl"
+      [disabled]="disabled"
+      [readonly]="readonly"
+    />
+    <mat-icon
+      matSuffix
+      style="color: #66615B !important; font-size: 21px !important"
+      >person_pin</mat-icon
+    >
+  </mat-form-field>
+  <mat-autocomplete
+    [hidden]="!isAutocomplete"
+    #auto="matAutocomplete"
+    [displayWith]="displayUserName"
+    (optionSelected)="selectedOption($event)"
+  >
+    <mat-option
+      [hidden]="!isAutocomplete"
+      *ngFor="let user of activitiesPlanningReportService.userSuggestions"
+      [value]="user"
+    >
+      <small *ngIf="!isLcdp">{{ user.displayName }} | {{ user.mail }}</small>
+      <small *ngIf="isLcdp">{{ user.displayName }} | {{ user.associate_id }}</small>
+      </mat-option
+    >
+  </mat-autocomplete>
+</div>

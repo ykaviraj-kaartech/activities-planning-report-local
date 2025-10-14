@@ -1,5 +1,5 @@
 <div class="container-fluid createTabbedStyles">
-    <div class="row border-bottom solid">
+    <!-- <div class="row border-bottom solid">
         <div class="col-12 ">
             <div class="row pt-2 tab-row">
                 <div class="col-11 tab-content">
@@ -49,15 +49,31 @@
                 <div class="col-1 pt-1">
                     <mat-icon class="smallCardIcons" (click)="closeTabbed()" style="cursor:pointer;"
                         matToolTip="Close">close</mat-icon>
-                    <!-- <button class="close-btn" (click)="closeTabbed()" style="cursor:pointer;" matToolTip="Close">Discard</button> -->
 
                 </div>
 
             </div>
         </div>
-    </div>
+    </div> -->
 
-    <div class="row">
+    <div class="row d-flex justify-content-end p-3 pb-4">
+        <div class="header-container-style">
+            <div *ngIf="tabbed_list[0]?.tab_id==4" class="create-task-header">
+                {{ mode }} Task
+            </div>
+            <div>
+                <div class="pt-1">
+                    <!-- <mat-icon class="smallCardIcons" (click)="closeTabbed()" style="cursor:pointer;"
+                        matToolTip="Close">close</mat-icon> -->
+                    <svg xmlns="http://www.w3.org/2000/svg" (click)="closeTabbed()" style="cursor:pointer; position: relative; top: -6px;" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <g id="Group">
+                        <path id="Vector" d="M11.9968 10.5857L16.9468 5.63574L18.3608 7.04974L13.4108 11.9997L18.3608 16.9497L16.9468 18.3637L11.9968 13.4137L7.04681 18.3637L5.63281 16.9497L10.5828 11.9997L5.63281 7.04974L7.04681 5.63574L11.9968 10.5857Z" fill="#B9C0CA"/>
+                        </g>
+                    </svg>
+    
+                </div>
+            </div>
+        </div>
 
         <div class="col-12" *ngFor="let tab of tabbed_list; let i=index; trackBy: trackTabId">
 
@@ -65,7 +81,7 @@
                 <app-create-task [application_reference_id]="application_reference_id" [activityId]="activity_id"
                     [application_id]="application_id" [application_name]="application_name"
                     [governance_id]="goverance_id" [data]="formData" [mode]="tab.mode" [selected]="tab.selected ?? false"
-                    [contactList]="contactList" [customer_id]="customer_id" (customer_list)="addCustomer($event)" [createdDate]="createdDate"
+                    [contactList]="contactList" [customer_id]="customer_id" (customer_list)="addCustomer($event)" [createdDate]="createdDate" [masterData]="masterData"
                     (edited_or_submitted)="editedOrCreated($event, i)"></app-create-task>
             </div>
 

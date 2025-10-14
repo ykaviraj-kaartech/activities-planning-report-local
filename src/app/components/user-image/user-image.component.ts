@@ -27,11 +27,16 @@ export class UserImageComponent implements OnInit {
       if (this.id) {
         if (this.imageList[this.id]) this.imgSrc = this.imageList[this.id];
         else {
-          let imageUrl = await this.activitiesPlanningReportService.getUserProfileImage(this.id);
-          if (imageUrl == null) {
+          let imageUrl = await this.activitiesPlanningReportService.getUserProfileImage(this.id) as any; 
+          if (imageUrl == null || imageUrl?.err == true) {
             this.imgSrc = 'assets/images/User.png';
           } else {
-            this.imgSrc = imageUrl
+            if(imageUrl?.data?.profile_image_url == null || imageUrl?.data?.profile_image_url == undefined){
+              this.imgSrc = 'assets/images/User.png';
+            }
+            else{
+              this.imgSrc = imageUrl?.data?.profile_image_url
+            }
 
             this.imageList[this.id] = this.imgSrc;
           }

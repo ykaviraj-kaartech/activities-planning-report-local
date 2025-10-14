@@ -1,7 +1,57 @@
 ::ng-deep #gantt{
     height: 80vh;
 }
+// ::ng-deep .b-tooltip{
+//     display: none !important;
+// }
+
+::ng-deep .b-gantt-task-title {
+    font-weight: 600;
+    display: none;
+    ::ng-deep table {
+        ::ng-deep tbody {
+            ::ng-deep tr:last-child{
+                display: none;
+            }
+        }
+    }
+}
+::ng-deep .b-panel-content.b-popup-content.b-tooltip-content{
+    font-family: 'DM Sans';
+    color: #FFF;
+    background: #45546E;
+    ::ng-deep table {
+        ::ng-deep tbody {
+            ::ng-deep tr:last-child{
+                display: none;
+            }
+        }
+    }
+}
+::ng-deep .b-tooltip{
+    --panel-background-color: #45546E;
+}
 .gantt-chart-style{
+    margin: 1% 0% 1% 0%;
+    --mdc-text-button-label-text-tracking: none;
+    --mdc-outlined-text-field-outline-color: transparent;
+    --mdc-outlined-text-field-input-text-placeholder-color: #B9C0CA;
+    --mdc-outlined-text-field-input-text-color: #757575;
+    --mdc-outlined-text-field-caret-color: #757575;
+    --mdc-outlined-text-field-focus-outline-color: transparent;
+    --mdc-outlined-text-field-focus-outline-color: #DADCE2;
+    --mdc-outlined-text-field-input-text-color: #515965;
+    --mat-datepicker-calendar-date-selected-state-background-color: #EE4961;
+    --mdc-icon-button-icon-color: #EE4961;
+    --mdc-outlined-text-field-focus-outline-color: #EE4961;
+    mat-progress-bar{
+        --mdc-linear-progress-active-indicator-color: #EE4961;
+        --mdc-linear-progress-track-color: #EE496120;
+    }
+    ::ng-deep .b-gantt-task-title {
+        font-weight: 600;
+        display: none;
+    }
 
     .leave-highlight {
         background: repeating-linear-gradient(
@@ -26,6 +76,16 @@
         z-index: 9;
         background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E %3Cpath d='M 0 0 L 10 10' stroke='rgba(0,0,0,0.3)' stroke-width='1'/%3E %3C/svg%3E");        background-size: 10px 10px;
         background-size: 10px 10px;
+        height: 24px !important;
+        margin-top: 0.8em;
+    }
+
+    ::ng-deep .b-tooltip{
+        display: none;
+    }
+
+    ::ng-deep .right-borders-remove{
+        border-right: none;
     }
 
     ::ng-deep .task-pink {
@@ -72,7 +132,51 @@
         border-color: #a5d8a7;
     } */
     ::ng-deep bryntum-gantt{
+        // min-height: calc(100vh - 119px) !important;
         min-height: 85vh !important;
+        border-top: 1px solid #DADCE2;
+        border-bottom: 1px solid #DADCE2;
+        ::ng-deep .b-sch-event-wrap .b-sch-label-after, .b-gantt-task-wrap .b-sch-label-after{
+            margin-inline-start: 0.5em;
+        }
+        ::ng-deep .b-sch-event-wrap .b-sch-label, .b-gantt-task-wrap .b-sch-label{
+            font-size: 20px;
+            color: red;
+        }
+    }
+    ::ng-deep .b-gantt-task-parent{
+        border-radius: 32px !important;
+    }
+    ::ng-deep .b-gantt-task-parent:not(.b-milestone-wrap) .b-gantt-task{
+        clip-path: none;
+    }
+    ::ng-deep .b-nonworkingtime-tip-title{
+        background-color: red;
+    }
+    ::ng-deep .custom-tooltip {
+        background-color: #4CAF50 !important; /* Change to your desired color */
+        color: white !important;  /* Change text color if needed */
+        border-radius: 6px !important; /* Optional: Add rounded corners */
+        border: 1px solid #388E3C !important; /* Optional: Add border */
+    }
+    ::ng-deep .b-tooltip{
+        --panel-background-color: #F7F9FB !important;
+    }
+    ::ng-deep .custom-tooltip-container {
+        background: #F7F9FB !important;
+        border: 1px solid #ccc !important;
+        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+        padding: 10px;
+        border-radius: 8px;
+    }
+    ::ng-deep .custom-tooltip {
+        background-color: #F7F9FB !important;
+        color: black !important;
+        border-radius: 5px;
+        padding: 10px;
+    }
+    ::ng-deep .b-panel .b-panel-body-wrap{
+        background-color: white !important;
     }
     ::ng-deep .b-tree-icon, 
     ::ng-deep .b-icon-tree-leaf, 
@@ -83,14 +187,46 @@
         color: #515965;
     }
 
+    ::ng-deep .b-icon-tree-leaf{
+        visibility: hidden;
+    }
+
+    ::ng-deep .b-gridbase.b-split .b-grid-splitter:not(.b-disabled){
+        flex: 0 0 2px;
+        background: #D4D6D8;
+    }
+
+    ::ng-deep .b-icon-tree-expand:before, .b-icon-tree-collapse:before{
+        font-size: 1em;
+    }
+
+    ::ng-deep .b-gridbase.b-split .b-grid-splitter:not(.b-disabled) .b-grid-splitter-inner{
+        width: 4px;
+    }
+
+    ::ng-deep .b-gridbase.b-split .b-grid-splitter:not(.b-disabled) .b-grid-splitter-buttons{
+        height: 1.4em;
+        width: 1.4em;
+    }
+
+    ::ng-deep.b-grid-subgrid.b-grid-subgrid-normal.b-widget.b-subgrid.b-timeaxissubgrid.b-resize-monitored.b-widget-scrolle.b-hide-scroll.b-last-visible-child.b-hide-row-hover.b-timeline-subgrid.b-droppable.b-draggable.b-horizontal-overflow{
+        background-image: none;
+    }
+
+    ::ng-deep .b-gridbase.b-split .b-grid-splitter:not(.b-disabled) .b-grid-splitter-button-icon{
+        height: 0.75em;
+    }
+
     ::ng-deep .b-tree-parent-row .b-grid-cell{
         color: #515965;
         font-family: 'DM Sans';
+        border-right: none;
     }
 
     ::ng-deep .b-grid-cell{
         color: #7D838B;
         font-family: 'DM Sans';
+        border-right: none;
     }
 
     ::ng-deep .b-gantt,
@@ -116,4 +252,200 @@
             border: 1px solid #333; /* Optional: Add a border for a better visual effect */
         }
     }
+
+    .search-bar {
+        left: -60px;
+        height: 46px;
+        border: 1px solid #DADCE2;
+        border-radius: 4px;
+        width: 280px;
+        font-family: 'DM Sans';
+        mat-form-field{
+            --mdc-outlined-text-field-hover-outline-color: transparent;
+        }
+        --mdc-outlined-text-field-hover-outline-color: transparent;
+        ::ng-deep .mat-mdc-text-field-wrapper, ::ng-deep .mat-mdc-form-field-flex{
+            height: 46px;
+        }
+        ::ng-deep .mdc-text-field--no-label .mat-mdc-form-field-infix{
+            padding-top: 12px;
+            padding-bottom: 10px;
+        }
+        ::ng-deep .mat-mdc-form-field {
+            --mdc-outlined-text-field-hover-outline-color: transparent;
+          width: 200px;
+          ::ng-deep .mat-mdc-form-field-has-icon-suffix .mat-mdc-text-field-wrapper{
+            height: 46px;
+          }
+          .mat-mdc-form-field-infix {
+            font-size: 14px !important;
+            padding: 8px 0 8px 0 !important;
+            padding: 46px;
+          }
+          .mat-mdc-form-field-flex{
+            height: 46px;
+            ::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mat-mdc-notch-piece{
+                --mdc-outlined-text-field-hover-outline-color: transparent;
+            }
+            .mdc-notched-outline{
+                .mat-mdc-notch-piece{
+                    --mdc-outlined-text-field-hover-outline-color: transparent;
+                    border-color: transparent;
+                }
+            }
+            ::ng-deep .mdc-notched-outlined .mat-mdc-notch-piece
+            {
+                border-color: transparent;
+            }
+          }
+          ::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mat-mdc-notch-piece
+          {
+            border-color: transparent;
+          }
+          .mat-mdc-form-field-wrapper {
+            padding-bottom: 5px !important;
+          }
+          ::ng-deep .mat-mdc-form-field-outline {
+            border-color: red !important;
+          }
+        }
+      }
+
+    .button-group {
+        display: flex;
+        /* gap: 10px; */
+        background: #fff;
+        border-radius: 20px;
+        padding: 5px;
+        height: fit-content;
+        border: 1px solid #DADCE2;
+        width: fit-content;
+      }
+      
+      .button-group button {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 16px;
+        font-weight: 500;
+        transition: 0.3s;
+        background: #fff;
+        font-family: 'DM Sans';
+      }
+      
+      .time-range-button {
+        color: #526179;
+        outline: none;
+      }
+      
+      .usd-button {
+        color: #526179;
+      }
+      
+      .active {
+        // background: white;
+        color: #EE4961;
+        // box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      
+      .date-picker-container{
+        display: flex;
+        cursor: pointer;
+      }
+
+      .create-task-btn {
+        border: none;
+        // padding: 3px 5px 3px 5px;
+        height: 46px;
+        border-radius: 4px;
+        background: var(--Primary-Maroon, #EE4961);
+        color: var(--Neutral-White, #FFF);
+        font-family: "DM Sans";
+        font-weight: 500;
+        line-height: 16px;
+        white-space: nowrap;
+        text-align: center;
+      }
+
+      .custom-back-btn {
+        border: none;
+        // padding: 3px 5px 3px 5px;
+        height: 46px;
+        border-radius: 4px;
+        background: #FFF;
+        color: #45546E;
+        font-family: "DM Sans";
+        font-weight: 500;
+        line-height: 16px;
+        white-space: nowrap;
+        text-align: center;
+        border: 1px solid #DADCE2;
+      }
+
+      .current-tab-heading{
+        color: #272A47;
+        font-family: "DM Sans";
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 500;
+        text-transform: capitalize;
+      }
+
+      .open-popup-button{
+        cursor: pointer;
+        color: var(--Blue-Grey-90, #526179);
+        font-family: "DM Sans";
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: normal;
+        text-align: center;
+    }
+
+    .slicer-container{
+        border: 1px solid #DADCE2;
+        max-width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        cursor: pointer;
+        left: 2px;
+    }
+
+    .reset-button {
+        font-family: "DM Sans";
+        font-size: 14px;
+        font-weight: 500 !important;
+        color: #526179;
+        background-color: #FFFFFF;
+        border: 1px solid #DADCE2;
+        border-radius: 4px;
+        line-height: 36px;
+        height: 48px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    input.hidden-input {
+        position: absolute !important;
+        width: 0 !important;
+        height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        clip: rect(0 0 0 0) !important;
+        overflow: hidden !important;
+    }
+
+    .date-text{
+        font-family: 'DM Sans';
+        font-weight: 500;
+        color: #526179;
+    }
+
 }

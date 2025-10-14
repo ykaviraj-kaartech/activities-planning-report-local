@@ -89,7 +89,7 @@
                     </div>
                   </div> 
             
-                  <div class="col-11">
+                  <div class="col-12">
                     <app-input-search  class="create-account-field" [list]="phase"
                     placeholder="Phase" formControlName='phase'>
                   </app-input-search>
@@ -103,7 +103,7 @@
                         <mat-icon class="iconButton">edit</mat-icon>
                     </div>
                   </div>
-                  <div class="col-11">
+                  <div class="col-12">
                     <mat-form-field appearance="outline" class="create-account-field">
                       <mat-label>Title</mat-label>
                       <input matInput placeholder="title" formControlName =  'title'>
@@ -117,7 +117,7 @@
                         <mat-icon class="iconButton">description</mat-icon>
                     </div>
                   </div>
-                  <div class="col-11">
+                  <div class="col-12">
                     <mat-form-field appearance="outline" class="textArea" style="width: 100%; font-size: 14px !important;">
                       <textarea matInput cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="4"
                         cdkAutosizeMaxRows="" placeholder="Description" formControlName = 'description' ></textarea>
@@ -199,7 +199,7 @@
       <div class="mt-3 container newTaskStyles form-container">
 
 
-        <div class="row pt-2">
+        <div class="row">
           <div class="col-12 pl-0 pr-0">
 
             <div class="row pt-1" *ngIf="application_id == 36 && displayPhase=='Show Phases Activity'">
@@ -209,7 +209,7 @@
                 </div>
               </div> -->
 
-              <div class="col-11">
+              <div class="col-12">
                 <div>
                   <span class="input-heading">
                     Phase
@@ -231,7 +231,7 @@
                         <mat-icon class="iconButton">edit</mat-icon>
                     </div>
                   </div> -->
-              <div class="col-11 pb-2">
+              <div class="col-12 pb-2">
                 <div>
                   <span class="input-heading">
                     Task Title
@@ -247,20 +247,43 @@
               </div>
             </div>
 
+            <div class="row pt-1">
+              <!-- <div class="col-1x pl-2">
+                    <div mat-icon-button class="side-icon mt-1">
+                        <mat-icon class="iconButton">edit</mat-icon>
+                    </div>
+                  </div> -->
+              <div class="col-12 pb-2">
+                <div>
+                  <span class="input-heading">
+                    Opportunity Name
+                  </span>
+                  <span class="required-field">
+                    *
+                  </span>
+                </div>
+                <div class="row mx-1">
+                  <app-input-search class="create-account-field" [list]="masterData" placeholder=""
+                    [disabled]="mode === 'Create'" formControlName='application_reference_id'>
+                  </app-input-search>
+                </div>
+              </div>
+            </div>
+
             <div class="row mb-3">
               <!-- <div class="col-1x pl-2">
                     <div mat-icon-button class="side-icon mt-1">
                         <mat-icon class="iconButton">description</mat-icon>
                     </div>
                   </div> -->
-              <div class="col-11">
+              <div class="col-12">
                 <div>
                   <span class="input-heading">
                     Task Description
                   </span>
-                  <span class="required-field">
+                  <!-- <span class="required-field">
                     *
-                  </span>
+                  </span> -->
                 </div>
                 <!-- <mat-form-field appearance="outline" class="textArea" style="width: 100%; font-size: 14px !important;">
                   <textarea matInput cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="4"
@@ -268,7 +291,7 @@
                     formControlName='description'></textarea>
                 </mat-form-field> -->
                 <div class="pl-0 editor-body-wrapper">
-                  <wyswig-editor formControlName="description" placeholder="Type details about the New Task here" #note></wyswig-editor>
+                  <wyswig-editor formControlName="description" [value]="taskForm.get('description')?.value" (valueChange)="updateDescription($event)" placeholder="Type details about the New Task here" #note></wyswig-editor>
                   <!-- <mat-form-field appearance="outline" style="width: 100%; font-size: 14px !important;">
                     <textarea matInput cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="6"
                       cdkAutosizeMaxRows="" placeholder="Description" formControlName="notes"></textarea>
@@ -283,7 +306,7 @@
                         <mat-icon class="iconButton">people</mat-icon>
                     </div>
                   </div> -->
-              <div class="col-5 pt-1">
+              <div class="col-6 pt-1">
                 <div>
                   <span class="input-heading">
                     Assigned To
@@ -292,9 +315,9 @@
                     *
                   </span>
                 </div>
-                <!-- <app-search-user [isAutocomplete]="true" label="" required="true" class="create-account-field"
+                <app-search-user [isAutocomplete]="true" label="" [required]="true" class="create-account-field"
                   formControlName='assignedTo'>
-                </app-search-user> -->
+                </app-search-user>
               </div>
               <div class="col-3">
                 <div>
@@ -337,12 +360,12 @@
           </div>
         </div>
 
-        <div class="pt-3 d-flex justify-content-between align-items-center" style="padding-right: 8%">
-          <div class="col-6 text-muted">
+        <div class="row pt-3">
+          <div class="col-6 p-0 text-muted">
             <crm-activity-association mode="edit" [associationConfig]="assocConfig"
               (update)="updateAssoc($event)"></crm-activity-association>
           </div>
-          <div class="col-6 d-flex justify-content-end" *ngIf="!buttonClicked">
+          <div class="col-6 p-0 d-flex justify-content-end" *ngIf="!buttonClicked">
             <button mat-icon-button class="submit-btn ml-2 mt-0" matTooltip="Create Task" type="submit"
               (click)="createTask();" *ngIf="mode == 'Create'">Create Task
             </button>
@@ -357,9 +380,9 @@
             <mat-spinner diameter="25" matTooltip="Loading ..."> </mat-spinner>
           </div>
         </div>
-        <div class="col-6 mt-4 pl-4 quotes">
+        <!-- <div class="col-6 mt-4 pl-4 quotes">
           {{quote}}
-        </div>
+        </div> -->
 
       </div>
     </form>
