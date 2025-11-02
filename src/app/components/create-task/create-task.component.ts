@@ -334,6 +334,24 @@ export class CreateTaskComponent implements OnInit, OnChanges {
           console.error(err);
         })
       }
+         if (this.application_id == 35){
+        this.activitiesPlanningReportService.createCRMActivities(this.taskForm.value, this.application_id, this.activityAssociation, 4).subscribe({
+          next: (response: any) => {
+            this.snackBar.open("Task Created Successfully!", "Dismiss", { duration: 2000 })
+
+            this.edited_or_submitted.emit("Created");
+            this.dialogRef.close({
+              text: 'update required',
+              newData: this.taskForm.value
+            });
+          },
+          error: (error: any) => {
+            this.snackBar.open("Failed to create task.", "Dismiss", { duration: 2000 })
+            this.buttonClicked = false;
+            console.error(error);
+          }
+        })
+      }
     } else {
       this.snackBar.open("Enter all Mandatory Fields!", "Dismiss", { duration: 2000 })
       this.buttonClicked = false;

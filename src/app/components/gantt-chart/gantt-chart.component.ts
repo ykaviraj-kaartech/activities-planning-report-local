@@ -84,6 +84,8 @@ export class GanttChartComponent {
   ]
 
   masterOpportunitiesList: any;
+  masterLeadsList : any;
+  masterAccountsList : any;
 
   popoverStyles = {
     'position': 'relative',
@@ -148,10 +150,12 @@ export class GanttChartComponent {
   buArray: any[] = [];
   soArray: any[] = [];
   ownerArray: any[] = [];
+  statusArray: any[] = [];
   sbuMain: any[] = [];
   buMain: any[] = [];
   soMain: any[] = [];
   ownerMain: any[] = [];
+  statusMain: any[] = [];
 
   filterModel: any = {};
   
@@ -162,6 +166,7 @@ export class GanttChartComponent {
   buFilter: boolean = false;
   ownerFilter: boolean = false;
   salesOrgFilter: boolean = false;
+  statusFilter : boolean = false;
   filterConfig: any = {};
   slicerData: any = {};
 
@@ -183,6 +188,22 @@ export class GanttChartComponent {
     this.activitiesPlanningReportService.getMasterOpportunitiesList().subscribe({
       next: (response) => {
         this.masterOpportunitiesList = response
+      },
+      error: (error) => {
+        console.log(error);
+      }
+    });
+      this.activitiesPlanningReportService.getMasterLeadsList().subscribe({
+      next: (response) => {
+        this.masterLeadsList = response
+      },
+      error: (error) => {
+        console.log(error);
+      }
+    });
+        this.activitiesPlanningReportService.getMasterAccountsList().subscribe({
+      next: (response) => {
+        this.masterAccountsList = response
       },
       error: (error) => {
         console.log(error);
@@ -279,7 +300,7 @@ export class GanttChartComponent {
                     if(taskRecord?.data?.is_activity === 1 || taskRecord?.data?.is_activity === true){
                       let currentDate = moment();
                       let statusToCheck = [1,2,7];
-                      if((moment(taskRecord?.data?.endDate) > currentDate) && statusToCheck.includes(taskRecord?.data?.activity_status_id)){
+                      if((moment(taskRecord?.data?.endDate) < currentDate) && statusToCheck.includes(taskRecord?.data?.activity_status_id)){
                         return '!'
                       }
                       else{
@@ -498,7 +519,7 @@ export class GanttChartComponent {
                     if(taskRecord?.data?.is_activity === 1 || taskRecord?.data?.is_activity === true){
                       let currentDate = moment();
                       let statusToCheck = [1,2,7];
-                      if((moment(taskRecord?.data?.endDate) > currentDate) && statusToCheck.includes(taskRecord?.data?.activity_status_id)){
+                      if((moment(taskRecord?.data?.endDate) < currentDate) && statusToCheck.includes(taskRecord?.data?.activity_status_id)){
                         return '!'
                       }
                       else{
@@ -721,6 +742,466 @@ export class GanttChartComponent {
           this.updateColumns();
         });
       }
+      else if (this.tab === "Leads"){
+        this.isLoading = true;
+        this.activitiesPlanningReportService.getActivitiesDataForGanttForId(this.tab, 35, this.startDateForData, this.endDateForData).subscribe((tasks: any) => {
+          console.log("nEw leads activities data", tasks);
+          this.isLoading = false;
+          let data = tasks?.messType == 'S' ? tasks?.messData[0] : []
+          this.ganttProps = {
+            project: {
+              autoLoad: true,
+              tasksData: this.modifyTasksData(data)
+            },
+            startDate : '2009-01-12',
+            endDate : '2029-03-24',
+            taskRenderer: ({ taskRecord, taskElement }: { taskRecord: any, taskElement: any }) => {
+              const taskName = taskRecord.name || 'No Name';
+              
+              const taskBarContent = document.createElement('div');
+              taskBarContent.innerHTML = `
+                <span class="task-name">${taskName}</span>
+              `;
+        
+              taskBarContent.style.position = 'absolute';
+              taskBarContent.style.top = '50%';
+              taskBarContent.style.left = '50%';
+              taskBarContent.style.transform = 'translate(-50%, -50%)';
+              taskBarContent.style.color = 'white';
+              taskBarContent.style.fontWeight = 'bold';
+              taskBarContent.style.fontSize = '12px';
+        
+              taskElement.appendChild(taskBarContent);
+            },
+            features: {
+              labels: {
+                right: {
+                   renderer : ({ taskRecord }: { taskRecord: any }) => {
+                    if(taskRecord?.data?.is_activity === 1 || taskRecord?.data?.is_activity === true){
+                      let currentDate = moment();
+                      let statusToCheck = [1,2,7];
+                      if((moment(taskRecord?.data?.endDate) < currentDate) && statusToCheck.includes(taskRecord?.data?.activity_status_id)){
+                        return '!'
+                      }
+                      else{
+                        return;
+                      }
+                    }
+                    else{
+                      return;
+                    }
+                  }
+                }
+              },
+              taskTooltip : {
+                template : ({ taskRecord }: { taskRecord: any }) => {
+                  if(taskRecord?.data?.is_activity == 1 || taskRecord?.data?.is_activity == true){
+                    return `
+                      <div style="display: flex; flex-direction: column; gap: 4px;">
+                        <div style="display: flex; justify-content: between; gap: 14px;">
+                          <div>Name</div>
+                          <div>:</div>
+                          <span>${taskRecord.name}</span>
+                        </div>
+                        <div style="display: flex; justify-content: between; gap: 14px;">
+                          <div>Start Date</div>
+                          <div>:</div>
+                          <span>${moment(taskRecord.startDate).format('DD-MM-YYYY')}</span>
+                        </div>
+                        <div style="display: flex; justify-content: between; gap: 14px;">
+                          <div>Due Date</div>
+                          <div>:</div>
+                          <span>${moment(taskRecord.endDate).format('DD-MM-YYYY')}</span>
+                        </div>
+                        <div style="display: flex; justify-content: between; gap: 14px;">
+                          <div>Activity Status</div>
+                          <div>:</div>
+                          <span>${this.getActivityStatusColor(taskRecord?.data?.activity_status_id, this.statusColorArray).statusText}</span>
+                        </div>
+                      </div>
+                    `;
+                  }
+                  else{
+                    return `
+                      <div style="display: flex; flex-direction: column; gap: 4px;">
+                        <div style="display: flex; justify-content: between; gap: 14px;">
+                          <div>Lead Name</div>
+                          <div>:</div>
+                          <span>${taskRecord.name}</span>
+                        </div>
+                        <div style="display: flex; justify-content: between; gap: 14px;">
+                          <div>Start Date</div>
+                          <div>:</div>
+                          <span>${moment(taskRecord.startDate).format('DD-MM-YYYY')}</span>
+                        </div>
+                        <div style="display: flex; justify-content: between; gap: 14px;">
+                          <div>Due Date</div>
+                          <div>:</div>
+                          <span>${moment(taskRecord.endDate).format('DD-MM-YYYY')}</span>
+                        </div>
+                      </div>
+                    `;
+                  }
+                }
+              },              
+              scrollButtons: true,
+              projectLines: false,
+              taskEdit: false,
+              dependencies: false,
+              pan : true,
+              eventDragCreate : false,
+              taskSelection: {
+                enabled: false,
+              },
+              // taskTooltip: {
+              //   enabled: true,
+              //   template: null,
+              //   tooltipTemplate({ taskRecord }: { taskRecord: any }) {
+              //     console.log('Tooltip triggered for:', taskRecord.name);
+              //     return `
+              //       <div class="custom-tooltip">
+              //         <p><strong>${taskRecord.name || 'Leave'}</strong></p>
+              //         <p>Start: ${DateHelper.format(taskRecord.startDate, 'L')}</p>
+              //         <p>End: ${DateHelper.format(taskRecord.endDate, 'L')}</p>
+              //       </div>
+              //     `;
+              //   }
+              // }
+            },
+            columns: [
+              { type: 'name', text: 'Lead / Task', field: 'name', width: 250, editor: false,
+                renderer: ({ record, cellElement }: { record: any, cellElement: HTMLElement }) => {
+                  cellElement.style.borderRight = 'none';
+                  return record.name;
+                },
+                afterRenderCell : ({ record, row, cellElement }: { record: any, row: any, cellElement: any }) => {
+                  // cellElement.classList.toggle('myClass', true);
+                  cellElement.style.borderRight = 'none';
+                  // row.cls.newRow = record.isPhantom;
+                }
+              },
+              { text: 'Assigned To', field: 'assigned_to', htmlEncode: false, width: 200, editor: false,
+                renderer: ({ record, cellElement }: { record: any, cellElement: HTMLElement }) => {
+                  cellElement.style.borderRight = 'none';
+                  return `<div class="user-profile-placeholder" data-assigned-to="${record.assigned_to}"></div>`;
+                },
+                afterRenderCell : ({ record, row, cellElement }: { record: any, row: any, cellElement: any }) => {
+                  // cellElement.classList.toggle('myClass', true);
+                  cellElement.style.borderRight = 'none';
+                  // row.cls.newRow = record.isPhantom;
+                }
+              },
+              { text: 'Start Date', field: 'start_date', htmlEncode: false, width: 200, editor: false,
+                renderer: ({ record, cellElement }: { record: any, cellElement: HTMLElement }) => {
+                  cellElement.style.borderRight = 'none';
+                  if(record?.data?.is_activity === 1 || record?.data?.is_activity === true){
+                    return moment(record?.data?.startDate).format("DD MMM YYYY");
+                  }
+                  else{
+                    return;
+                  }
+                },
+                afterRenderCell : ({ record, row, cellElement }: { record: any, row: any, cellElement: any }) => {
+                  // cellElement.classList.toggle('myClass', true);
+                  cellElement.style.borderRight = 'none';
+                  // row.cls.newRow = record.isPhantom;
+                }
+              },
+              { text: 'End Date', field: 'end_date', htmlEncode: false, width: 200, editor: false,
+                renderer: ({ record, cellElement }: { record: any, cellElement: HTMLElement }) => {
+                  cellElement.style.borderRight = 'none';
+                  if(record?.data?.is_activity === 1 || record?.data?.is_activity === true){
+                    return moment(record?.data?.endDate).format("DD MMM YYYY");
+                  }
+                  else{
+                    return;
+                  }
+                },
+                afterRenderCell : ({ record, row, cellElement }: { record: any, row: any, cellElement: any }) => {
+                  // cellElement.classList.toggle('myClass', true);
+                  cellElement.style.borderRight = 'none';
+                  // row.cls.newRow = record.isPhantom;
+                }
+              },
+              { text: 'Status', field: 'activity_status_id', htmlEncode: false, width: 200, editor: false,
+                renderer: ({ record, cellElement }: { record: any, cellElement: HTMLElement }) => {
+                  // cellElement.style.borderRight = 'none';
+                  if(record?.data?.is_activity === 1 || record?.data?.is_activity === true){
+                    let cellParams = this.getActivityStatusColor(record?.data?.activity_status_id, this.statusColorArray)
+                    console.log('cellParams', cellParams);
+                    const chipHtml = `
+                      <span class="activity-chip"
+                            style="
+                              background-color: ${cellParams.statusColor};
+                              color: ${cellParams.statusTextColor};
+                              padding: 4px 10px;
+                              width: 86px;
+                              text-align: center;
+                              font-size: 12px;
+                              display: inline-block;
+                              font-weight: 500;
+                            ">
+                        ${cellParams.statusText}
+                      </span>
+                    `;
+
+                    return chipHtml;
+                  }
+                  else{
+                    return;
+                  }
+                },
+              },
+              { text: 'Actions', width: 50, editor: false,
+                
+              }
+            ],
+            listeners: {
+              beforeExpand: ({ record }: { record: any }) => {
+                if (!record.children.length) {
+                  // this.loadChildTasks(record);
+                }
+              },
+              taskdblclick: (event: any) => {
+                event.preventDefault();
+              }
+            }
+          };
+          this.initializeSlicerData(data);
+          // this.updateColumns();
+  
+        });
+      }
+      else if (this.tab === "Accounts"){
+        this.isLoading = true;
+        this.activitiesPlanningReportService.getActivitiesDataForGanttForId(this.tab, 33, this.startDateForData, this.endDateForData).subscribe((tasks: any) => {
+          console.log("nEw accounts activities data", tasks);
+          this.isLoading = false;
+          let data = tasks?.messType == 'S' ? tasks?.messData[0] : []
+          this.ganttProps = {
+            project: {
+              autoLoad: true,
+              tasksData: this.modifyTasksData(data)
+            },
+            startDate : '2009-01-12',
+            endDate : '2029-03-24',
+            taskRenderer: ({ taskRecord, taskElement }: { taskRecord: any, taskElement: any }) => {
+              const taskName = taskRecord.name || 'No Name';
+              
+              const taskBarContent = document.createElement('div');
+              taskBarContent.innerHTML = `
+                <span class="task-name">${taskName}</span>
+              `;
+        
+              taskBarContent.style.position = 'absolute';
+              taskBarContent.style.top = '50%';
+              taskBarContent.style.left = '50%';
+              taskBarContent.style.transform = 'translate(-50%, -50%)';
+              taskBarContent.style.color = 'white';
+              taskBarContent.style.fontWeight = 'bold';
+              taskBarContent.style.fontSize = '12px';
+        
+              taskElement.appendChild(taskBarContent);
+            },
+            features: {
+              labels: {
+                right: {
+                   renderer : ({ taskRecord }: { taskRecord: any }) => {
+                    if(taskRecord?.data?.is_activity === 1 || taskRecord?.data?.is_activity === true){
+                      let currentDate = moment();
+                      let statusToCheck = [1,2,7];
+                      if((moment(taskRecord?.data?.endDate) < currentDate) && statusToCheck.includes(taskRecord?.data?.activity_status_id)){
+                        return '!'
+                      }
+                      else{
+                        return;
+                      }
+                    }
+                    else{
+                      return;
+                    }
+                  }
+                }
+              },
+              taskTooltip : {
+                template : ({ taskRecord }: { taskRecord: any }) => {
+                  if(taskRecord?.data?.is_activity == 1 || taskRecord?.data?.is_activity == true){
+                    return `
+                      <div style="display: flex; flex-direction: column; gap: 4px;">
+                        <div style="display: flex; justify-content: between; gap: 14px;">
+                          <div>Name</div>
+                          <div>:</div>
+                          <span>${taskRecord.name}</span>
+                        </div>
+                        <div style="display: flex; justify-content: between; gap: 14px;">
+                          <div>Start Date</div>
+                          <div>:</div>
+                          <span>${moment(taskRecord.startDate).format('DD-MM-YYYY')}</span>
+                        </div>
+                        <div style="display: flex; justify-content: between; gap: 14px;">
+                          <div>Due Date</div>
+                          <div>:</div>
+                          <span>${moment(taskRecord.endDate).format('DD-MM-YYYY')}</span>
+                        </div>
+                        <div style="display: flex; justify-content: between; gap: 14px;">
+                          <div>Activity Status</div>
+                          <div>:</div>
+                          <span>${this.getActivityStatusColor(taskRecord?.data?.activity_status_id, this.statusColorArray).statusText}</span>
+                        </div>
+                      </div>
+                    `;
+                  }
+                  else{
+                    return `
+                      <div style="display: flex; flex-direction: column; gap: 4px;">
+                        <div style="display: flex; justify-content: between; gap: 14px;">
+                          <div>Account Name</div>
+                          <div>:</div>
+                          <span>${taskRecord.name}</span>
+                        </div>
+                        <div style="display: flex; justify-content: between; gap: 14px;">
+                          <div>Start Date</div>
+                          <div>:</div>
+                          <span>${moment(taskRecord.startDate).format('DD-MM-YYYY')}</span>
+                        </div>
+                        <div style="display: flex; justify-content: between; gap: 14px;">
+                          <div>Due Date</div>
+                          <div>:</div>
+                          <span>${moment(taskRecord.endDate).format('DD-MM-YYYY')}</span>
+                        </div>
+                      </div>
+                    `;
+                  }
+                }
+              },              
+              scrollButtons: true,
+              projectLines: false,
+              taskEdit: false,
+              dependencies: false,
+              pan : true,
+              eventDragCreate : false,
+              taskSelection: {
+                enabled: false,
+              },
+              // taskTooltip: {
+              //   enabled: true,
+              //   template: null,
+              //   tooltipTemplate({ taskRecord }: { taskRecord: any }) {
+              //     console.log('Tooltip triggered for:', taskRecord.name);
+              //     return `
+              //       <div class="custom-tooltip">
+              //         <p><strong>${taskRecord.name || 'Leave'}</strong></p>
+              //         <p>Start: ${DateHelper.format(taskRecord.startDate, 'L')}</p>
+              //         <p>End: ${DateHelper.format(taskRecord.endDate, 'L')}</p>
+              //       </div>
+              //     `;
+              //   }
+              // }
+            },
+            columns: [
+              { type: 'name', text: 'Account / Task', field: 'name', width: 250, editor: false,
+                renderer: ({ record, cellElement }: { record: any, cellElement: HTMLElement }) => {
+                  cellElement.style.borderRight = 'none';
+                  return record.name;
+                },
+                afterRenderCell : ({ record, row, cellElement }: { record: any, row: any, cellElement: any }) => {
+                  // cellElement.classList.toggle('myClass', true);
+                  cellElement.style.borderRight = 'none';
+                  // row.cls.newRow = record.isPhantom;
+                }
+              },
+              { text: 'Assigned To', field: 'assigned_to', htmlEncode: false, width: 200, editor: false,
+                renderer: ({ record, cellElement }: { record: any, cellElement: HTMLElement }) => {
+                  cellElement.style.borderRight = 'none';
+                  return `<div class="user-profile-placeholder" data-assigned-to="${record.assigned_to}"></div>`;
+                },
+                afterRenderCell : ({ record, row, cellElement }: { record: any, row: any, cellElement: any }) => {
+                  // cellElement.classList.toggle('myClass', true);
+                  cellElement.style.borderRight = 'none';
+                  // row.cls.newRow = record.isPhantom;
+                }
+              },
+              { text: 'Start Date', field: 'start_date', htmlEncode: false, width: 200, editor: false,
+                renderer: ({ record, cellElement }: { record: any, cellElement: HTMLElement }) => {
+                  cellElement.style.borderRight = 'none';
+                  if(record?.data?.is_activity === 1 || record?.data?.is_activity === true){
+                    return moment(record?.data?.startDate).format("DD MMM YYYY");
+                  }
+                  else{
+                    return;
+                  }
+                },
+                afterRenderCell : ({ record, row, cellElement }: { record: any, row: any, cellElement: any }) => {
+                  // cellElement.classList.toggle('myClass', true);
+                  cellElement.style.borderRight = 'none';
+                  // row.cls.newRow = record.isPhantom;
+                }
+              },
+              { text: 'End Date', field: 'end_date', htmlEncode: false, width: 200, editor: false,
+                renderer: ({ record, cellElement }: { record: any, cellElement: HTMLElement }) => {
+                  cellElement.style.borderRight = 'none';
+                  if(record?.data?.is_activity === 1 || record?.data?.is_activity === true){
+                    return moment(record?.data?.endDate).format("DD MMM YYYY");
+                  }
+                  else{
+                    return;
+                  }
+                },
+                afterRenderCell : ({ record, row, cellElement }: { record: any, row: any, cellElement: any }) => {
+                  // cellElement.classList.toggle('myClass', true);
+                  cellElement.style.borderRight = 'none';
+                  // row.cls.newRow = record.isPhantom;
+                }
+              },
+              { text: 'Status', field: 'activity_status_id', htmlEncode: false, width: 200, editor: false,
+                renderer: ({ record, cellElement }: { record: any, cellElement: HTMLElement }) => {
+                  // cellElement.style.borderRight = 'none';
+                  if(record?.data?.is_activity === 1 || record?.data?.is_activity === true){
+                    let cellParams = this.getActivityStatusColor(record?.data?.activity_status_id, this.statusColorArray)
+                    console.log('cellParams', cellParams);
+                    const chipHtml = `
+                      <span class="activity-chip"
+                            style="
+                              background-color: ${cellParams.statusColor};
+                              color: ${cellParams.statusTextColor};
+                              padding: 4px 10px;
+                              width: 86px;
+                              text-align: center;
+                              font-size: 12px;
+                              display: inline-block;
+                              font-weight: 500;
+                            ">
+                        ${cellParams.statusText}
+                      </span>
+                    `;
+
+                    return chipHtml;
+                  }
+                  else{
+                    return;
+                  }
+                },
+              },
+              { text: 'Actions', width: 50, editor: false,
+                
+              }
+            ],
+            listeners: {
+              beforeExpand: ({ record }: { record: any }) => {
+                if (!record.children.length) {
+                  // this.loadChildTasks(record);
+                }
+              },
+              taskdblclick: (event: any) => {
+                event.preventDefault();
+              }
+            }
+          };
+          this.initializeSlicerData(data);
+          // this.updateColumns();
+  
+        });
+      }
   }
 
   // onTaskExpand({ record }: { record: any }) {
@@ -777,14 +1258,28 @@ export class GanttChartComponent {
           height: '87%',
           width: '45rem',
           maxHeight: 'fit-content',
-          data: {
-            tabbed_content_type: 4,
-            customer_id: taskEvent.taskRecord.data?.application_reference_id,
-            mode: "Edit",
-            application_reference_id: taskEvent.taskRecord.data?.application_reference_id,
-            application_id: 36,
-            formData: res[0],
-            masterData: this.masterOpportunitiesList
+         data: {
+          tabbed_content_type: 4,
+          customer_id: taskEvent.taskRecord.data?.application_reference_id,
+          mode: "Edit",
+          application_reference_id: taskEvent.taskRecord.data?.application_reference_id,
+          application_id:
+            this.tab === 'Opportunities'
+              ? 36
+              : this.tab === 'Leads'
+                ? 35
+                : this.tab === 'Accounts'
+                  ? 33
+                  : null,
+          formData: res[0],
+          masterData:
+            this.tab === 'Opportunities'
+              ? this.masterOpportunitiesList
+              : this.tab === 'Leads'
+                ? this.masterLeadsList
+                : this.tab === 'Accounts'
+                  ? this.masterAccountsList
+                  : this.masterOpportunitiesList
           }
         });
         dialogRef.afterClosed().subscribe(async result => {
@@ -825,7 +1320,7 @@ export class GanttChartComponent {
   
       if (changes.startDate || changes.endDate) {
         this.activitiesPlanningReportService.updateActivityDates((record as any).data.id, record.startDate, record.endDate).subscribe((task: any) => {
-          if(this.tab == 'Opportunities'){
+          if(this.tab == 'Opportunities' || this.tab == 'Leads' || this.tab == 'Accounts'){
             this.loadChildTasks(ganttInstance.taskStore.getById((record as any).data?.application_reference_id));
             this.cdr.detectChanges();
           }
@@ -859,7 +1354,7 @@ export class GanttChartComponent {
     });
 
     columns.forEach((col: any) => {
-      if (this.tab === "Opportunities" && col.data.field === 'assigned_to') {
+      if ((this.tab === "Opportunities" || this.tab === "Accounts" || this.tab === "Leads") && col.data.field === 'assigned_to') {
         col.renderer = (value: any, task: any, column: any) => {
           if (value?.record?.data?.sales_activity_id !== undefined || value?.record?.data?.sales_activity_id != null){
             
@@ -906,83 +1401,65 @@ export class GanttChartComponent {
           return;
         };
       }
-      else if (col.data.text === 'Actions') {
-        col.renderer = (value: any, task: any, column: any) => {
-            
-            const container = document.createElement('div');
-      
-            const componentRef = this.viewContainerRef.createComponent(MoreActionsComponent, {
-              injector: this.injector
-            });
-      
-            componentRef.instance.column = value?.record?.data;
-            componentRef.instance.masterData = this.masterOpportunitiesList;
+   else if (col.data.text === 'Actions') {
+  col.renderer = (value: any, task: any, column: any) => {
+    const container = document.createElement('div');
 
-            if (this.tab == "Opportunities"){
-              this.subscription = componentRef.instance.actionClickedForCreate.subscribe((eventData: any) => {
-                console.log(ganttInstance.project.taskStore.records.find(task => {
-                  return task?.id === eventData?.activity?.id
-                }))
-                this.loadChildTasks(ganttInstance.taskStore.getById(eventData?.activity?.id));
-                this.cdr.detectChanges();
-              });
+    const componentRef = this.viewContainerRef.createComponent(MoreActionsComponent, {
+      injector: this.injector
+    });
 
-              this.subscription = componentRef.instance.actionClickedForEdit.subscribe((eventData: any) => {
-                console.log(ganttInstance.project.taskStore.records.find(task => {
-                  return task?.id === eventData?.activity?.id
-                }))
-                this.loadChildTasks(ganttInstance.taskStore.getById(eventData?.activity?.application_reference_id));
-                this.cdr.detectChanges();
-              });
+    // ✅ Existing properties
+    componentRef.instance.column = value?.record?.data;
+    componentRef.instance.masterData = this.tab === 'Opportunities' ? this.masterOpportunitiesList : this.tab === 'Leads' ? this.masterLeadsList : this.tab === 'Accounts' ? this.masterAccountsList : this.masterOpportunitiesList;
 
-              this.subscription = componentRef.instance.actionClickedForDelete.subscribe((eventData: any) => {
-                console.log(ganttInstance.project.taskStore.records.find(task => {
-                  return task?.id === eventData?.activity?.id
-                }))
-                this.loadChildTasks(ganttInstance.taskStore.getById(eventData?.activity?.application_reference_id));
-                this.cdr.detectChanges();
-              });
-            }
-            else if (this.tab == "People"){
-              this.subscription = componentRef.instance.actionClickedForCreate.subscribe((eventData: any) => {
-                console.log(ganttInstance.project.taskStore.records.find(task => {
-                  return task?.id === eventData?.activity?.id
-                }))
-                let parentItem = ganttInstance.taskStore?.find((item: any) => item?.name == eventData?.newData?.assignedTo);
-                this.loadChildTasks(parentItem);
-                this.cdr.detectChanges();
-              })
 
-              this.subscription = componentRef.instance.actionClickedForEdit.subscribe((eventData: any) => {
-                console.log(ganttInstance.project.taskStore.records.find(task => {
-                  return task?.id === eventData?.activity?.id
-                }))
-                let parentItem = ganttInstance.taskStore?.find((item: any) => item?.name == eventData?.newData?.assignedTo);
-                this.loadChildTasks(parentItem);
-                // if (eventData?.activity?.assigned_to != eventData?.newData?.assignedTo){
-                //   let parentItem = ganttInstance.taskStore?.find((item: any) => item?.name == eventData?.activity?.assigned_to);
-                //   this.loadChildTasks(parentItem);
-                // }
-                this.cdr.detectChanges();
-              })
+    // ✅ Add this line
+    componentRef.instance.tab = this.tab;
 
-              this.subscription = componentRef.instance.actionClickedForDelete.subscribe((eventData: any) => {
-                console.log(ganttInstance.project.taskStore.records.find(task => {
-                  return task?.id === eventData?.activity?.id
-                }))
-                let parentItem = ganttInstance.taskStore?.find((item: any) => item?.name == eventData?.activity?.assigned_to);
-                this.loadChildTasks(parentItem);
-                this.cdr.detectChanges();
-              })
-            }
-      
-            container.appendChild(componentRef.location.nativeElement);
-      
-            componentRef.changeDetectorRef.detectChanges();
-      
-            return container;
-        };
-      }
+    // ✅ Event subscriptions remain the same
+    if (this.tab == "Opportunities" || this.tab == "Leads" || this.tab == "Accounts") {
+      this.subscription = componentRef.instance.actionClickedForCreate.subscribe((eventData: any) => {
+        this.loadChildTasks(ganttInstance.taskStore.getById(eventData?.activity?.id));
+        this.cdr.detectChanges();
+      });
+
+      this.subscription = componentRef.instance.actionClickedForEdit.subscribe((eventData: any) => {
+        this.loadChildTasks(ganttInstance.taskStore.getById(eventData?.activity?.application_reference_id));
+        this.cdr.detectChanges();
+      });
+
+      this.subscription = componentRef.instance.actionClickedForDelete.subscribe((eventData: any) => {
+        this.loadChildTasks(ganttInstance.taskStore.getById(eventData?.activity?.application_reference_id));
+        this.cdr.detectChanges();
+      });
+    } else if (this.tab == "People") {
+      this.subscription = componentRef.instance.actionClickedForCreate.subscribe((eventData: any) => {
+        let parentItem = ganttInstance.taskStore?.find((item: any) => item?.name == eventData?.newData?.assignedTo);
+        this.loadChildTasks(parentItem);
+        this.cdr.detectChanges();
+      });
+
+      this.subscription = componentRef.instance.actionClickedForEdit.subscribe((eventData: any) => {
+        let parentItem = ganttInstance.taskStore?.find((item: any) => item?.name == eventData?.newData?.assignedTo);
+        this.loadChildTasks(parentItem);
+        this.cdr.detectChanges();
+      });
+
+      this.subscription = componentRef.instance.actionClickedForDelete.subscribe((eventData: any) => {
+        let parentItem = ganttInstance.taskStore?.find((item: any) => item?.name == eventData?.activity?.assigned_to);
+        this.loadChildTasks(parentItem);
+        this.cdr.detectChanges();
+      });
+    }
+
+    container.appendChild(componentRef.location.nativeElement);
+    componentRef.changeDetectorRef.detectChanges();
+
+    return container;
+  };
+}
+
     });
 
     const lockedSubgrids = document.querySelectorAll('[id^="b-gantt-"][id$="-lockedSubgrid"]');
@@ -1142,7 +1619,7 @@ export class GanttChartComponent {
     });
 
     columns.forEach((col: any) => {
-      if (this.tab === "Opportunities" && col.data.field === 'assigned_to') {
+      if ((this.tab === "Opportunities" || this.tab === "Accounts" || this.tab === "Leads")  && col.data.field === 'assigned_to') {
         col.renderer = (value: any, task: any, column: any) => {
           if (value?.record?.data?.sales_activity_id !== undefined || value?.record?.data?.sales_activity_id != null){
             
@@ -1199,9 +1676,18 @@ export class GanttChartComponent {
             });
       
             componentRef.instance.column = value?.record?.data;
-            componentRef.instance.masterData = this.masterOpportunitiesList;
+          componentRef.instance.masterData =
+          this.tab === 'Opportunities'
+            ? this.masterOpportunitiesList
+            : this.tab === 'Leads'
+              ? this.masterLeadsList
+              : this.tab === 'Accounts'
+                ? this.masterAccountsList
+                : this.masterOpportunitiesList;
 
-            if (this.tab == "Opportunities"){
+            componentRef.instance.tab = this.tab;
+
+            if (this.tab == "Opportunities" || this.tab == "Leads" || this.tab == "Accounts"){
               this.subscription = componentRef.instance.actionClickedForCreate.subscribe((eventData: any) => {
                 console.log(ganttInstance.project.taskStore.records.find(task => {
                   return task?.id === eventData?.activity?.id
@@ -1311,7 +1797,7 @@ export class GanttChartComponent {
   }
 
   loadChildTasks(parentTask: any) {
-    if (this.tab === "Opportunities"){
+    if (this.tab === "Opportunities" || this.tab === "Leads" || this.tab === "Accounts"){
       this.isLoading = true;
       this.activitiesPlanningReportService.getActivitiesDataForGantt(this.tab, parentTask.id, this.startDateForData, this.endDateForData).subscribe((childTasks: any) => {
         this.isLoading = false;
@@ -1600,14 +2086,29 @@ export class GanttChartComponent {
         height: '87%',
         width: '45rem',
         maxHeight: 'fit-content',
-        data:{
-          tabbed_content_type: 4,
-          customer_id: null,
-          mode:"Create",
-          application_reference_id: null,
-          application_id: 36,
-          masterData: this.masterOpportunitiesList
-        }
+       data: {
+  tabbed_content_type: 4,
+  customer_id: null,
+  mode: "Create",
+  application_reference_id: null,
+  application_id:
+    this.tab === 'Opportunities'
+      ? 36
+      : this.tab === 'Leads'
+        ? 35
+        : this.tab === 'Accounts'
+          ? 33
+          : null,
+  masterData:
+    this.tab === 'Opportunities'
+      ? this.masterOpportunitiesList
+      : this.tab === 'Leads'
+        ? this.masterLeadsList
+        : this.tab === 'Accounts'
+          ? this.masterAccountsList
+          : this.masterOpportunitiesList
+}
+
       });
       dialogRef.afterClosed().subscribe(async (result: any) => {
         if (result?.text == "update required") {
@@ -1640,12 +2141,32 @@ export class GanttChartComponent {
     this.loadHeaderTasks();
     this.cdr.detectChanges();
   }
+
+  changeTabToLeads(){
+    if(this.tab == 'Leads'){
+      return;
+    }
+    this.isGanttRefreshRequired = true;
+    this.tab = 'Leads';
+    this.loadHeaderTasks();
+    this.cdr.detectChanges();
+  }
+
+   changeTabToAccounts(){
+    if(this.tab == 'Accounts'){
+      return;
+    }
+    this.isGanttRefreshRequired = true;
+    this.tab = 'Accounts';
+    this.loadHeaderTasks();
+    this.cdr.detectChanges();
+  }
   
   updateColumns() {
     const ganttInstance = this.ganttCmp.instance;
     let columns: any[] = Array.isArray(ganttInstance.columns) ? ganttInstance.columns : (ganttInstance.columns as any)?.allRecords || [];
     columns.forEach((col: any) => {
-      if (this.tab === "Opportunities" && col?.data?.field === 'assigned_to') {
+      if ((this.tab === "Opportunities" || this.tab === "Accounts" || this.tab === "Leads") && col?.data?.field === 'assigned_to') {
         col.renderer = (value: any, task: any, column: any) => {
           if (value?.record?.data?.sales_activity_id !== undefined || value?.record?.data?.sales_activity_id != null) {
             const container = document.createElement('div');
@@ -1689,7 +2210,8 @@ export class GanttChartComponent {
           });
   
           componentRef.instance.column = value?.record?.data;
-          componentRef.instance.masterData = this.masterOpportunitiesList;
+          componentRef.instance.masterData = this.tab === 'Opportunities' ? this.masterOpportunitiesList : this.tab === 'Leads' ? this.masterLeadsList : this.tab === 'Accounts' ? this.masterAccountsList : this.masterOpportunitiesList;
+          componentRef.instance.tab = this.tab;
           container.appendChild(componentRef.location.nativeElement);
           componentRef.changeDetectorRef.detectChanges();
           return container;
@@ -1829,11 +2351,13 @@ export class GanttChartComponent {
     let seenBu = new Set<string>();
     let seenSo = new Set<string>();
     let seenOwner = new Set<string>();
+    let seenStatus = new Set<string>();
 
     this.sbuArray = [];
     this.buArray = [];
     this.soArray = [];
     this.ownerArray = [];
+    this.statusArray = [];
 
     data.forEach((item: any) => {
       item?.children?.forEach((child: any) => {
@@ -1875,10 +2399,21 @@ export class GanttChartComponent {
       });
     });
     
+     data.forEach((item: any) => {
+      item?.children?.forEach((child: any) => {
+        const status = child?.activity_status_name;
+        if (status && !seenStatus.has(status)) {
+          seenStatus.add(status);
+          this.statusArray.push({ name: status, isClicked: true, isSelected: false });
+        }
+      });
+    });
+    
     this.sbuMain = this.sbuArray;
     this.buMain = this.buArray;
     this.soMain = this.soArray;
     this.ownerMain = this.ownerArray;
+    this.statusMain = this.statusArray;
 
     this.isSlicerLoading = false;
 
@@ -1886,13 +2421,15 @@ export class GanttChartComponent {
       SBU: this.sbuArray,
       BU: this.buArray,
       Owner: this.ownerArray,
-      SO: this.soArray
+      SO: this.soArray,
+      Status : this.statusArray
     };
     this.filterConfig = {
       SBU: this.sbuFilter,
       BU: this.buFilter,
       Owner: this.ownerFilter,
-      SO: this.salesOrgFilter
+      SO: this.salesOrgFilter,
+      Status: this.statusFilter
     }
     this.activitiesPlanningReportService.slicerData = this.slicerData;
     this.activitiesPlanningReportService.filterConfigService = this.filterConfig;
@@ -1915,6 +2452,9 @@ export class GanttChartComponent {
         break;
       case 'SO':
         this.updateLevelFilter('sales_unit_name', this.selectedItem);
+        break;
+      case 'Status':
+        this.updateLevelFilter('activity_status_name', this.selectedItem);
         break; 
       default:
         console.log("no such slicer");
@@ -1925,11 +2465,13 @@ export class GanttChartComponent {
     this.buFilter = _.contains(_.keys(this.filterModel),"bu")
     this.ownerFilter = _.contains(_.keys(this.filterModel),"sales_owner_name")
     this.salesOrgFilter = _.contains(_.keys(this.filterModel),"sales_unit_name")
+    this.statusFilter = _.contains(_.keys(this.filterModel),"activity_status_name")
     this.filterConfig = {
       SBU:this.sbuFilter,
       BU: this.buFilter,
       Owner: this.ownerFilter,
-      SO: this.salesOrgFilter
+      SO: this.salesOrgFilter,
+      Status: this.statusFilter
     }
     // this.slicerData = {
     //   SBU: this.sbuArray,
@@ -1955,22 +2497,26 @@ export class GanttChartComponent {
     let buSet: any = [];
     let ownerSet: any = [];
     let soSet: any = [];
+    let statusSet : any = [];
     filteredData.forEach((data: any) => {
       data?.children?.forEach((child: any) => {
         sbuSet.push(child?.data?.sbu);
         buSet.push(child?.data?.bu);
         ownerSet.push(child?.data?.sales_owner_name);
         soSet.push(child?.data?.sales_unit_name);
+        statusSet.push(child?.data?.activity_status_name);
       });
     });
     sbuSet = new Set(sbuSet);
     buSet = new Set(buSet);
     ownerSet = new Set(ownerSet);
     soSet = new Set(soSet);
+    statusSet = new Set(statusSet);
     this.updateHighlightedItems(this.sbuArray, sbuSet);
     this.updateHighlightedItems(this.buArray, buSet);
     this.updateHighlightedItems(this.ownerArray, ownerSet);
     this.updateHighlightedItems(this.soArray, soSet);
+    this.updateHighlightedItems(this.statusArray, statusSet);
     this.sbuArray = _.sortBy(this.sbuArray, function (item) {
       return !item.isClicked;
     });
@@ -1984,18 +2530,22 @@ export class GanttChartComponent {
     this.soArray = _.sortBy(this.soArray, function (item) {
       return !item.isClicked;
     });
+    this.statusArray = _.sortBy(this.statusArray, function (item) {
+      return !item.isClicked;
+    });
     this.slicerData = {
       SBU: this.sbuArray,
       BU: this.buArray,
       Owner: this.ownerArray,
-      SO: this.soArray
+      SO: this.soArray,
+      Status : this.statusArray
     };
     this.activitiesPlanningReportService.slicerData = this.slicerData;
     this.checkIfResetButtonPresent();
   }
 
   updateallSlicerArrays() {
-    const keysToUpdate = ['SBU', 'BU', 'SO', 'Owner'];
+    const keysToUpdate = ['SBU', 'BU', 'SO', 'Owner', 'Status'];
 
     keysToUpdate.forEach(key => {
       const slicerArray = this.slicerData[key];
@@ -2073,6 +2623,13 @@ export class GanttChartComponent {
         delete this.filterModel["sales_unit_name"];
         this.salesOrgFilter = false
         break;
+      case 'Status':
+        this.statusArray.forEach(item => item.isSelected = false);
+        this.updateLevelFilter('activity_status_name', null);
+        this.statusArray = [...this.statusMain];
+        delete this.filterModel["activity_status_name"];
+        this.statusFilter = false
+        break;
       default:
         console.log("no such slicer");
         break;
@@ -2082,7 +2639,8 @@ export class GanttChartComponent {
       SBU:this.sbuFilter,
       BU: this.buFilter,
       Owner: this.ownerFilter,
-      SO: this.salesOrgFilter
+      SO: this.salesOrgFilter,
+      Status: this.statusFilter
     }
     if (JSON.stringify(this.filterModel) === '{}') {
       this.isResetButtonPresent = false;
@@ -2103,11 +2661,13 @@ export class GanttChartComponent {
     let seenBu = new Set<string>();
     let seenSo = new Set<string>();
     let seenOwner = new Set<string>();
+    let seenStatus = new Set<string>();
 
     this.sbuArray = [];
     this.buArray = [];
     this.soArray = [];
     this.ownerArray = [];
+    this.statusArray = [];
 
     this.ganttCmp?.instance?.taskStore.records.forEach(parent => {
       parent.allChildren.forEach(child => {
@@ -2115,6 +2675,7 @@ export class GanttChartComponent {
         const bu = child?.getData("bu");
         const so = child?.getData("sales_unit_name");
         const owner = child?.getData("sales_owner_name");
+        const status = child?.getData("activity_status_name");
 
         if (sbu && !seenSbu.has(sbu)) {
           seenSbu.add(sbu);
@@ -2132,6 +2693,10 @@ export class GanttChartComponent {
           seenOwner.add(owner);
           this.ownerArray.push({ name: owner, isClicked: true, isSelected: false });
         }
+        if (status && !seenStatus.has(status)) {
+          seenStatus.add(status);
+          this.statusArray.push({ name: status, isClicked: true, isSelected: false });
+        }
 
       })
     });
@@ -2140,21 +2705,25 @@ export class GanttChartComponent {
     this.buMain = this.buArray;
     this.ownerMain = this.ownerArray;
     this.soMain = this.soArray;
+    this.statusMain = this.statusArray;
     this.slicerData = {
       SBU: this.sbuArray,
       BU: this.buArray,
       Owner: this.ownerArray,
-      SO: this.soArray
+      SO: this.soArray,
+      Status : this.statusArray
     }; 
     this.sbuFilter = _.contains(_.keys(this.filterModel),"sbu")
     this.buFilter = _.contains(_.keys(this.filterModel),"bu")
     this.ownerFilter = _.contains(_.keys(this.filterModel),"sales_owner_name")
     this.salesOrgFilter = _.contains(_.keys(this.filterModel),"sales_unit_name")
+    this.statusFilter = _.contains(_.keys(this.filterModel),"activity_status_name")
     this.filterConfig = {
       SBU:this.sbuFilter,
       BU: this.buFilter,
       Owner: this.ownerFilter,
-      SO: this.salesOrgFilter
+      SO: this.salesOrgFilter,
+      Status: this.statusFilter
     }
     this.activitiesPlanningReportService.filterConfigService = this.filterConfig;
     this.activitiesPlanningReportService.slicerData = this.slicerData;

@@ -21,6 +21,7 @@ export class MoreActionsComponent {
   @Output() actionClickedForEdit: EventEmitter<any> = new EventEmitter();
   @Output() actionClickedForCreate: EventEmitter<any> = new EventEmitter();
   @Output() actionClickedForDelete: EventEmitter<any> = new EventEmitter();
+  @Input() tab!: any;
   private overlayRef: OverlayRef | undefined;
 
   constructor(
@@ -89,6 +90,7 @@ export class MoreActionsComponent {
   // }
 
   onEdit() {
+    console.log("app name",this.tab)
     if (this.column.sales_activity_id == 4) {
         this.activitiesPlanningReportService.taskFormDetails(this.column.id).then((res: any) => {
           const dialogRef = this.dialog.open(TabbedComponentComponent, {
@@ -100,7 +102,14 @@ export class MoreActionsComponent {
               customer_id: this.column.application_reference_id,
               mode: "Edit",
               application_reference_id: this.column.application_reference_id,
-              application_id: 36,
+            application_id: 
+              this.tab === 'Opportunities'
+                ? 36
+                : this.tab === 'Leads'
+                  ? 35
+                  : this.tab === 'Accounts'
+                    ? 33
+                    : 36,
               formData: res[0],
               masterData: this.masterData
             }
@@ -118,6 +127,7 @@ export class MoreActionsComponent {
   }
 
   onDelete() {
+    console.log("app name",this.tab)
     if(this.column?.activity_status_id == 3){
       this.showSnackBar("Completed Activites cannot be deleted", 2000);
     }
@@ -136,6 +146,7 @@ export class MoreActionsComponent {
     // this.closeMenu();
   }
   onCreate(){
+    console.log("app name",this.tab)
     const dialogRef = this.dialog.open(TabbedComponentComponent, {
       height: '87%',
       width: '45rem',
@@ -145,7 +156,14 @@ export class MoreActionsComponent {
         customer_id: this.column?.in_account,
         mode:"Create",
         application_reference_id: this.column?.id,
-        application_id: 36,
+        application_id: 
+          this.tab === 'Opportunities'
+            ? 36
+            : this.tab === 'Leads'
+              ? 35
+              : this.tab === 'Accounts'
+                ? 33
+                : 36,
         masterData: this.masterData
       }
     });

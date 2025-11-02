@@ -101,6 +101,8 @@ export class TabbedComponentComponent implements OnInit, OnChanges {
 
 
   async ngOnInit() {
+    console.log("id in tabbed component", this.application_id);
+    console.log("masterData in tabbed component", this.masterData);
     await this.activitiesPlanningReportService.getActivitiesType().then((res: any) => {
       let data = res as any[];
       let isDemoPresent = data.filter(item => item.id === 9);

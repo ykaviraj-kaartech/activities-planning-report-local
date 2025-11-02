@@ -255,9 +255,17 @@
                   </div> -->
               <div class="col-12 pb-2">
                 <div>
-                  <span class="input-heading">
-                    Opportunity Name
-                  </span>
+                <span class="input-heading">
+                {{
+                  application_id == 36
+                    ? 'Opportunity Name'
+                    : application_id == 35
+                    ? 'Lead Name'
+                    : application_id == 33
+                    ? 'Account Name'
+                    : 'Opportunity Name'
+                }}
+              </span>
                   <span class="required-field">
                     *
                   </span>

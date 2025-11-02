@@ -377,6 +377,36 @@ export class ActivitiesPlanningReportService {
   )
   }
 
+  getMasterLeadsList = () => {
+    let hostname = this.hostnameGlobal;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.token}`,
+    });
+    if (this.hostnameGlobal === 'localhost') {
+      hostname = 'localhost:3011';
+    }
+    return this.http.post(`http://${hostname}/api/leadsV2/getMasterLeadsList`, {
+    },
+    { headers }
+  )
+  }
+
+  getMasterAccountsList = () => {
+    let hostname = this.hostnameGlobal;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.token}`,
+    });
+    if (this.hostnameGlobal === 'localhost') {
+      hostname = 'localhost:3011';
+    }
+    return this.http.post(`http://${hostname}/api/accountsV2/getMasterAccountsList`, {
+    },
+    { headers }
+  )
+  }
+
   editCRMActivities(activity_id: any, crmFormDetails: any, application_id: any, associations: any, type_id: any) {
     let hostname = this.hostnameGlobal;
     const headers = new HttpHeaders({
