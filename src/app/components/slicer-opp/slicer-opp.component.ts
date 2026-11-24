@@ -20,7 +20,7 @@ export class SlicerOppComponent implements OnInit, OnChanges {
     ) { }
   
     ngOnInit(): void {
-      const desiredOrder = ['SBU', 'BU', 'SO', 'Owner', 'Status', 'ClosureDate', 'SubmissionDate'];
+      const desiredOrder = ['SBU', 'BU', 'SO', 'Owner', 'Status', 'Presales Status', 'ClosureDate', 'SubmissionDate'];
     
       const hasKanbanSlicerData = this.activitiesPlanningReportService.slicerData &&
         Object.keys(this.activitiesPlanningReportService.slicerData).length > 0;

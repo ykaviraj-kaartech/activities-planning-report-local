@@ -46,6 +46,14 @@ export class CreateTaskComponent implements OnInit, OnChanges {
   updatedActivityCount: number | undefined;
   assocConfig: any;
   // masterOpportunitiesList: any;
+  masterApplicationData = [
+    { id: 33, name: "Accounts"},
+    { id: 36, name: "Opportunities"},
+    { id: 34, name: "Contacts"},
+    { id: 35, name: "Leads"},
+  ]
+
+  masterDataForCurrentApp: any;
 
   constructor(
     private fb: FormBuilder,
@@ -67,6 +75,7 @@ export class CreateTaskComponent implements OnInit, OnChanges {
       applicationId: [''],
       governanceType: [null as string | number | null],
       phase: [null as string | number | null],
+      inApplication: [''] 
     });
   }
 
@@ -121,19 +130,27 @@ export class CreateTaskComponent implements OnInit, OnChanges {
 
     this.currentUser = this.activitiesPlanningReportService.getProfile()?.profile;
 
-    this.displayPhase = this.activitiesPlanningReportService.getLabelForOpportunity(36, 16).subscribe({
-      next: (label) => {
-        if (label == ""){
-          return "Show Phases Activity";
-        }
-        else{
-          return label;
-        }
-      },
-      error: (error) => {
-        return null;
-      }
+    // this.displayPhase = this.activitiesPlanningReportService.getLabelForOpportunity(36, 16).subscribe({
+    //   next: (label) => {
+    //     if (label == ""){
+    //       return "Show Phases Activity";
+    //     }
+    //     else{
+    //       return label;
+    //     }
+    //   },
+    //   error: (error) => {
+    //     return null;
+    //   }
+    // });
+
+    this.activitiesPlanningReportService.getLabelForOpportunity(36, 16).subscribe((label: any) => {
+      console.log(label);
+      this.displayPhase = label == "" ? "Show Phases Activity" : label;
     });
+
+    // this.displayPhase = this.activitiesPlanningReportService.getLabelForOpportunity(36, 16) == "" ? "Show Phases Activity" : this.activitiesPlanningReportService.getLabelForOpportunity(36, 16)
+
 
     this.application_reference_id = parseInt(this.application_reference_id)
     if (this.mode == "Edit") {
@@ -161,6 +178,7 @@ export class CreateTaskComponent implements OnInit, OnChanges {
         startDate: this.createdDate? this.createdDate : moment().format(),
         endDate: moment().add(1, 'week').format(),
         phase: 47,
+        inApplication: this.application_id,
         // createdBy: this.currentUser.oid
       })
     }
@@ -200,6 +218,38 @@ export class CreateTaskComponent implements OnInit, OnChanges {
     //     console.log(error);
     //   }
     // });
+
+    this.masterDataForCurrentApp = this.masterData.find((item: any) => item.id == this.application_id)?.data;
+
+    this.taskForm.get('inApplication').valueChanges.subscribe((res: any) => {
+      this.application_id = res;
+      this.taskForm.get('applicationId')?.setValue(this.application_id, { emitEvent: false });
+      this.masterDataForCurrentApp = this.masterData.find((item: any) => item.id == res)?.data;
+      
+
+    })
+
+    this.taskForm.get('application_reference_id').valueChanges.subscribe((res: any) => {
+      this.application_reference_id = res;
+      this.activityAssociation = {
+        accounts: this.application_id == 33 ? [this.application_reference_id] : [],
+        contacts: this.application_id == 34 ? [this.application_reference_id] : [],
+        leads: this.application_id == 35 ? [this.application_reference_id] : [],
+        opportunities: this.application_id == 36 ? [this.application_reference_id] : [],
+        default: {
+          account: this.application_id == 33 ? this.application_reference_id : null,
+          contact: this.application_id == 34 ? this.application_reference_id : null,
+          lead: this.application_id == 35 ? this.application_reference_id : null,
+          opportunity: this.application_id == 36 ? this.application_reference_id : null
+        }
+      }
+
+      this.assocConfig = {
+        appId: this.application_id,
+        elementId: this.application_reference_id,
+        activityAssociation: { ...this.activityAssociation }
+      }
+    })
 
   }
 

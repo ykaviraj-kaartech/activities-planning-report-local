@@ -104,12 +104,14 @@ export class MoreActionsComponent {
               application_reference_id: this.column.application_reference_id,
             application_id: 
               this.tab === 'Opportunities'
-                ? 36
-                : this.tab === 'Leads'
-                  ? 35
-                  : this.tab === 'Accounts'
-                    ? 33
-                    : 36,
+            ? 36
+            : this.tab === 'Leads'
+              ? 35
+              : this.tab === 'Accounts'
+                ? 33
+                  : this.tab === 'Contacts'
+                    ? 34
+                      : 36,
               formData: res[0],
               masterData: this.masterData
             }
@@ -148,7 +150,7 @@ export class MoreActionsComponent {
   onCreate(){
     console.log("app name",this.tab)
     const dialogRef = this.dialog.open(TabbedComponentComponent, {
-      height: '87%',
+      height: '98%',
       width: '45rem',
       maxHeight: 'fit-content',
       data:{
@@ -163,7 +165,9 @@ export class MoreActionsComponent {
               ? 35
               : this.tab === 'Accounts'
                 ? 33
-                : 36,
+                  : this.tab === 'Contacts'
+                    ? 34
+                      : 36,
         masterData: this.masterData
       }
     });

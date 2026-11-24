@@ -37,6 +37,9 @@
                           <button mat-menu-item (click)="changeTabToAccounts()">
                             <span style="font-family: DM Sans;">Accounts</span>
                         </button>
+                        <button mat-menu-item (click)="changeTabToContacts()">
+                            <span style="font-family: DM Sans;">Contacts</span>
+                        </button>
                         <!-- </div> -->
                     <!-- </div> -->
                 </mat-menu>
@@ -260,6 +263,23 @@
         (ready)="onGanttReady($event)"
     ></bryntum-gantt>
        <bryntum-gantt *ngIf="tab === 'Accounts' && !isRefreshNeeded"
+        id="bryntum-gantt"
+        class="bryntum-gantt"
+        style="height: 80vh;"
+        #gantt
+        [columns]                 = "ganttProps.columns"
+        [endDate]                 = "ganttProps.endDate"
+        [project]                 = "ganttProps.project"
+        [startDate]               = "ganttProps.startDate"
+        [projectLinesFeature]     = "ganttProps.features.projectLines"
+        [scrollButtonsFeature]    = "ganttProps.features.scrollButtons"
+        [labelsFeature]           = "ganttProps.features.labels"
+        [taskTooltipFeature]      = "ganttProps.features.taskTooltip"
+        [taskEditFeature]         = "ganttProps.features.taskEdit"
+        [dependenciesFeature]     = "ganttProps.features.dependencies"
+        (ready)="onGanttReady($event)"
+    ></bryntum-gantt>
+    <bryntum-gantt *ngIf="tab === 'Contacts' && !isRefreshNeeded"
         id="bryntum-gantt"
         class="bryntum-gantt"
         style="height: 80vh;"

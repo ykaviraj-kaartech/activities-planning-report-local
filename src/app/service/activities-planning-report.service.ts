@@ -294,7 +294,17 @@ export class ActivitiesPlanningReportService {
 
   }
 
-  getLabelForOpportunity = (application_id: any, id: any) =>{
+  // getLabelForOpportunity = (application_id: any, id: any) =>{
+  //   return this.getUserLabel().pipe(
+  //     map((res: any) => {
+  //       const label = res['data'];
+  //       const val = _.where(label, { application_id, id });
+  //       return val.length > 0 ? val[0]['label_name'] : "";
+  //     })
+  //   );
+  // }
+  
+  getLabelForOpportunity(application_id: any, id: any): Observable<string> {
     return this.getUserLabel().pipe(
       map((res: any) => {
         const label = res['data'];
@@ -303,7 +313,7 @@ export class ActivitiesPlanningReportService {
       })
     );
   }
-
+  
   getUserLabel() {
     let hostname = this.hostnameGlobal;
     const headers = new HttpHeaders({
@@ -311,12 +321,12 @@ export class ActivitiesPlanningReportService {
       Authorization: `Bearer ${this.token}`,
     });
     if (this.hostnameGlobal === 'localhost') {
-      hostname = 'localhost:3011';
+      hostname = 'localhost:3001';
     }
     try {
-      return this.http.post(`http://${hostname}/api/contacts/getContactForAccount`, {}, { headers });
+      return this.http.post(`http://${hostname}/api/general/getLabelForUser`, {}, { headers });
     } catch (err) {
-      console.error("Error fetching user profile:", err);
+      console.error("Error fetching user label:", err);
       throw err;
     }
   }
@@ -402,6 +412,21 @@ export class ActivitiesPlanningReportService {
       hostname = 'localhost:3011';
     }
     return this.http.post(`http://${hostname}/api/accountsV2/getMasterAccountsList`, {
+    },
+    { headers }
+  )
+  }
+
+  getMasterContactsList = () => {
+    let hostname = this.hostnameGlobal;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.token}`,
+    });
+    if (this.hostnameGlobal === 'localhost') {
+      hostname = 'localhost:3011';
+    }
+    return this.http.post(`http://${hostname}/api/contactsV2/getMasterContactsList`, {
     },
     { headers }
   )

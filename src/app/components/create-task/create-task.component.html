@@ -90,7 +90,7 @@
                   </div> 
             
                   <div class="col-12">
-                    <app-input-search  class="create-account-field" [list]="phase"
+                    <app-input-search  class="create-task-field" [list]="phase"
                     placeholder="Phase" formControlName='phase'>
                   </app-input-search>
               
@@ -104,7 +104,7 @@
                     </div>
                   </div>
                   <div class="col-12">
-                    <mat-form-field appearance="outline" class="create-account-field">
+                    <mat-form-field appearance="outline" class="create-task-field">
                       <mat-label>Title</mat-label>
                       <input matInput placeholder="title" formControlName =  'title'>
                     </mat-form-field>
@@ -132,13 +132,13 @@
                     </div>
                   </div>
                   <div class="col-5 pt-1">
-                    <app-search-user [isAutocomplete]="true" label="Assigned to" required="true"  class="create-account-field"
+                    <app-search-user [isAutocomplete]="true" label="Assigned to" required="true"  class="create-task-field"
                     formControlName  = 'assignedTo'
                     >
                     </app-search-user>
                   </div>
                   <div class="col-3">
-                    <mat-form-field appearance="outline" class="create-account-field">
+                    <mat-form-field appearance="outline" class="create-task-field">
                       <mat-label>Start Date</mat-label>
                       <input matInput [matDatepicker]="picker0" required="true"
                       formControlName = 'startDate'
@@ -149,7 +149,7 @@
                   </div>
 
                   <div class="col-3">
-                    <mat-form-field appearance="outline" class="create-account-field">
+                    <mat-form-field appearance="outline" class="create-task-field">
                       <mat-label>End Date</mat-label>
                       <input matInput [matDatepicker]="picker1" required="true"
                       formControlName = 'endDate'
@@ -196,20 +196,20 @@
   </div> -->
   <div *ngIf="mode !='View'">
     <form [formGroup]='taskForm'>
-      <div class="mt-3 container newTaskStyles form-container">
+      <div class="mt-3 px-0 container newTaskStyles form-container">
 
 
         <div class="row">
           <div class="col-12 pl-0 pr-0">
 
-            <div class="row pt-1" *ngIf="application_id == 36 && displayPhase=='Show Phases Activity'">
+            <div class="row px-3 pt-1" *ngIf="application_id == 36 && displayPhase=='Show Phases Activity'">
               <!-- <div class="col-1x pl-2">
                 <div mat-icon-button class="side-icon mt-1">
                   <mat-icon class="iconButton">vertical_split</mat-icon>
                 </div>
               </div> -->
 
-              <div class="col-12">
+              <div class="col-12 px-0">
                 <div>
                   <span class="input-heading">
                     Phase
@@ -218,20 +218,20 @@
                     *
                   </span>
                 </div>
-                <app-input-search class="create-account-field" [list]="phase" placeholder=""
+                <app-input-search class="create-task-field" [list]="phase" placeholder=""
                   formControlName='phase'>
                 </app-input-search>
 
               </div>
             </div>
 
-            <div class="row pt-1">
+            <div class="row px-3 pt-1">
               <!-- <div class="col-1x pl-2">
                     <div mat-icon-button class="side-icon mt-1">
                         <mat-icon class="iconButton">edit</mat-icon>
                     </div>
                   </div> -->
-              <div class="col-12 pb-2">
+              <div class="col-12 px-0 pb-2">
                 <div>
                   <span class="input-heading">
                     Task Title
@@ -240,51 +240,75 @@
                     *
                   </span>
                 </div>
-                <mat-form-field appearance="outline" class="create-account-field">
+                <mat-form-field appearance="outline" class="create-task-field">
                   <!-- <mat-label>Title</mat-label> -->
                   <input class="mb-1" matInput placeholder="Type Task Title here" formControlName='title'>
                 </mat-form-field>
               </div>
             </div>
 
-            <div class="row pt-1">
+            <div class="row px-3 pt-1">
               <!-- <div class="col-1x pl-2">
                     <div mat-icon-button class="side-icon mt-1">
                         <mat-icon class="iconButton">edit</mat-icon>
                     </div>
                   </div> -->
-              <div class="col-12 pb-2">
+              <div class="col-12 px-0 pb-2">
                 <div>
-                <span class="input-heading">
-                {{
-                  application_id == 36
-                    ? 'Opportunity Name'
-                    : application_id == 35
-                    ? 'Lead Name'
-                    : application_id == 33
-                    ? 'Account Name'
-                    : 'Opportunity Name'
-                }}
-              </span>
+                  <span class="input-heading">
+                    {{
+                      application_id == 36
+                        ? 'Opportunity Name'
+                        : application_id == 35
+                        ? 'Lead Name'
+                        : application_id == 33
+                        ? 'Account Name'
+                        : application_id == 34
+                        ? 'Contact Name'
+                        : 'Opportunity Name'
+                    }}
+                  </span>
                   <span class="required-field">
                     *
                   </span>
                 </div>
                 <div class="row mx-1">
-                  <app-input-search class="create-account-field" [list]="masterData" placeholder=""
+                  <app-input-search class="create-task-field" [list]="masterDataForCurrentApp" placeholder=""
                     [disabled]="mode === 'Create'" formControlName='application_reference_id'>
                   </app-input-search>
                 </div>
               </div>
             </div>
+            <div class="row px-3 pt-1">
+              <!-- <div class="col-1x pl-2">
+                    <div mat-icon-button class="side-icon mt-1">
+                        <mat-icon class="iconButton">edit</mat-icon>
+                    </div>
+                  </div> -->
+              <div class="col-12 px-0 pb-2">
+                <div>
+                  <span class="input-heading">
+                    In Application
+                  </span>
+                  <span class="required-field">
+                    *
+                  </span>
+                </div>
+                <div class="row mx-1">
+                  <app-input-search class="create-task-field" [list]="masterApplicationData" placeholder=""
+                    [disabled]="mode === 'Create'" formControlName='inApplication'>
+                  </app-input-search>
+                </div>
+              </div>
+            </div>
 
-            <div class="row mb-3">
+            <div class="row px-3 mb-3">
               <!-- <div class="col-1x pl-2">
                     <div mat-icon-button class="side-icon mt-1">
                         <mat-icon class="iconButton">description</mat-icon>
                     </div>
                   </div> -->
-              <div class="col-12">
+              <div class="col-12 px-0">
                 <div>
                   <span class="input-heading">
                     Task Description
@@ -308,13 +332,13 @@
               </div>
             </div>
 
-            <div class="row">
+            <div class="row px-3">
               <!-- <div class="col-1x pl-2">
                     <div mat-icon-button class="side-icon mt-1">
                         <mat-icon class="iconButton">people</mat-icon>
                     </div>
                   </div> -->
-              <div class="col-6 pt-1">
+              <div class="col-6 pl-0 pt-1">
                 <div>
                   <span class="input-heading">
                     Assigned To
@@ -323,7 +347,7 @@
                     *
                   </span>
                 </div>
-                <app-search-user [isAutocomplete]="true" label="" [required]="true" class="create-account-field"
+                <app-search-user [isAutocomplete]="true" label="" [required]="true" class="create-task-field"
                   formControlName='assignedTo'>
                 </app-search-user>
               </div>
@@ -336,7 +360,7 @@
                     *
                   </span>
                 </div>
-                <mat-form-field appearance="outline" class="create-account-field">
+                <mat-form-field appearance="outline" class="create-task-field">
                   <!-- <mat-label>Start Date</mat-label> -->
                   <input matInput [matDatepicker]="picker0" required="true" formControlName='startDate'
                     class="date-input" />
@@ -345,7 +369,7 @@
                 </mat-form-field>
               </div>
 
-              <div class="col-3">
+              <div class="col-3 pr-0">
                 <div>
                   <span class="input-heading">
                     End Date
@@ -354,7 +378,7 @@
                     *
                   </span>
                 </div>
-                <mat-form-field appearance="outline" class="create-account-field">
+                <mat-form-field appearance="outline" class="create-task-field">
                   <!-- <mat-label>End Date</mat-label> -->
                   <input matInput [matDatepicker]="picker1" required="true" formControlName='endDate'
                     class="date-input" />

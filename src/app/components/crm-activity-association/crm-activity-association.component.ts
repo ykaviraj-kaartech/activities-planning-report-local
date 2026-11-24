@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivityAssociation } from './models/activity-association.model';
 import { AssociationConfig } from "./models/association-config.model"
@@ -9,7 +9,7 @@ import { CrmActivityAssociationService } from './services/crm-activity-associati
   templateUrl: './crm-activity-association.component.html',
   styleUrls: ['./crm-activity-association.component.scss']
 })
-export class CrmActivityAssociationComponent implements OnInit {
+export class CrmActivityAssociationComponent implements OnInit, OnChanges {
 
   // Inputs: 
   @Input() associationConfig!: AssociationConfig;
@@ -117,6 +117,10 @@ export class CrmActivityAssociationComponent implements OnInit {
 
 
   constructor(private activityAssocService: CrmActivityAssociationService, private _snackbar: MatSnackBar) { }
+
+  ngOnChanges(changes: SimpleChanges){
+    this.ngOnInit();
+  }
 
 
 

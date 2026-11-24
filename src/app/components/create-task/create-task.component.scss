@@ -220,7 +220,7 @@
         padding: 8px 12px;
         border-radius: 4px;
         font-family: "DM Sans";
-        font-size: 14px;
+        font-size: 16px;
         line-height: 16px;
         letter-spacing: -0.28px;
         width: max-content;
@@ -246,6 +246,15 @@
         .mat-mdc-form-field-flex {
           height: 40px;
         }
+      }
+
+      ::ng-deep .create-task-field .mat-mdc-input-element {
+        position: relative;
+        top: -6px;
+      }
+
+      .create-task-field{
+        width: 100%;
       }
 
 }

@@ -44,7 +44,6 @@ export const MY_DATE_FORMATS = {
 })
 export class GanttChartComponent {
 
-  oidForTesting = "1813919e-ce3e-4f6f-820c-627aac1da0bb";
   @ViewChild('gantt', { static: false }) ganttCmp!: BryntumGanttComponent;
   
   @ViewChild('startInput') startInput!: ElementRef<HTMLInputElement>;
@@ -53,7 +52,7 @@ export class GanttChartComponent {
   @ViewChild('endPicker') endPicker!: MatDatepicker<Date>;
 
   ganttProps: any;
-  tab: any = "Opportunities"; // Opportunities, People
+  tab: any = "Opportunities"; // Opportunities, People, Leads, Accounts, Contacts
   showTaskNonWorkingtime: any = true;
 
   isGanttRefreshRequired: boolean = false;
@@ -69,6 +68,8 @@ export class GanttChartComponent {
   // endDateForData: any = moment({ year: new Date().getFullYear(), month: new Date().getMonth() }).endOf('month').format('YYYY-MM-DD');
   endDateForData: any = moment({ year: new Date().getFullYear(), month: new Date().getMonth() }).endOf('month').format('YYYY-MM-DD HH:mm:ss');
   scrollStartDate: any = moment(this.startDateForData).add(2, 'months').format('YYYY-MM-DD');
+  startDateForGanttDate: any = moment(this.startDateForData).subtract(10, 'years').format('YYYY-MM-DD');
+  endDateForGanttDate: any = moment(this.startDateForData).add(10, 'years').format('YYYY-MM-DD');
   subscriptionCreate: any;
   subscription: any;
 
@@ -86,6 +87,7 @@ export class GanttChartComponent {
   masterOpportunitiesList: any;
   masterLeadsList : any;
   masterAccountsList : any;
+  masterContactsList : any;
 
   popoverStyles = {
     'position': 'relative',
@@ -151,11 +153,13 @@ export class GanttChartComponent {
   soArray: any[] = [];
   ownerArray: any[] = [];
   statusArray: any[] = [];
+  presalesStatusArray: any[] = [];
   sbuMain: any[] = [];
   buMain: any[] = [];
   soMain: any[] = [];
   ownerMain: any[] = [];
   statusMain: any[] = [];
+  presalesStatusMain: any[] = [];
 
   filterModel: any = {};
   
@@ -167,6 +171,7 @@ export class GanttChartComponent {
   ownerFilter: boolean = false;
   salesOrgFilter: boolean = false;
   statusFilter : boolean = false;
+  presalesStatusFilter : boolean = false;
   filterConfig: any = {};
   slicerData: any = {};
 
@@ -204,6 +209,14 @@ export class GanttChartComponent {
         this.activitiesPlanningReportService.getMasterAccountsList().subscribe({
       next: (response) => {
         this.masterAccountsList = response
+      },
+      error: (error) => {
+        console.log(error);
+      }
+    });
+    this.activitiesPlanningReportService.getMasterContactsList().subscribe({
+      next: (response) => {
+        this.masterContactsList = response
       },
       error: (error) => {
         console.log(error);
@@ -267,14 +280,15 @@ export class GanttChartComponent {
         this.isLoading = true;
         this.activitiesPlanningReportService.getActivitiesDataForGanttForId(this.tab, 36, this.startDateForData, this.endDateForData).subscribe((tasks: any) => {
           this.isLoading = false;
-          let data = tasks?.messType == 'S' ? tasks?.messData[0] : []
+          let data = tasks?.messType == 'S' ? tasks?.messData?.[0] || [] : []
+          console.log('test for data', data);
           this.ganttProps = {
             project: {
               autoLoad: true,
               tasksData: this.modifyTasksData(data)
             },
-            startDate : '2009-01-12',
-            endDate : '2029-03-24',
+            startDate : this.startDateForGanttDate,
+            endDate : this.endDateForGanttDate,
             taskRenderer: ({ taskRecord, taskElement }: { taskRecord: any, taskElement: any }) => {
               const taskName = taskRecord.name || 'No Name';
               
@@ -345,7 +359,7 @@ export class GanttChartComponent {
                     return `
                       <div style="display: flex; flex-direction: column; gap: 4px;">
                         <div style="display: flex; justify-content: between; gap: 14px;">
-                          <div>Opportunity Name</div>
+                          <div>Opportunity/Account/Lead/Contact Name</div>
                           <div>:</div>
                           <span>${taskRecord.name}</span>
                         </div>
@@ -389,15 +403,19 @@ export class GanttChartComponent {
               // }
             },
             columns: [
-              { type: 'name', text: 'Opportunity / Task', field: 'name', width: 250, editor: false,
+              { type: 'name', text: 'Opportunity / Task', field: 'name', width: 250, editor: false,htmlEncode: false,
                 renderer: ({ record, cellElement }: { record: any, cellElement: HTMLElement }) => {
                   cellElement.style.borderRight = 'none';
-                  return record.name;
-                },
-                afterRenderCell : ({ record, row, cellElement }: { record: any, row: any, cellElement: any }) => {
-                  // cellElement.classList.toggle('myClass', true);
-                  cellElement.style.borderRight = 'none';
-                  // row.cls.newRow = record.isPhantom;
+                  const isActivity = record?.data?.is_activity === 1 || record?.data?.is_activity === true;
+                  const id = isActivity ? record?.application_reference_id : record?.id;
+                  const customerName = !isActivity ? record?.customer_name : null;
+                  return `
+                    <span style="display:inline-flex; align-items:center; gap:6px;">
+                      ${id ? `<span>${id} -</span>` : ''}
+                      <span>${record?.name ?? ''}</span>
+                      ${customerName ? `<span>- ${customerName}</span>` : ''}
+                    </span>
+                  `;
                 }
               },
               { text: 'Assigned To', field: 'assigned_to', htmlEncode: false, width: 200, editor: false,
@@ -496,8 +514,8 @@ export class GanttChartComponent {
         this.isLoading = true;
         this.activitiesPlanningReportService.getActivitiesDataForGanttForId(this.tab, 36, this.startDateForData, this.endDateForData).subscribe((tasks: any) => {
           this.isLoading = false;
-          let taskData = tasks?.messType == 'S' ? tasks?.messData[0] : []
-          let leaveData = tasks?.messType == 'S' ? tasks?.messData[1] : []
+          let taskData = tasks?.messType == 'S' ? tasks?.messData?.[0] || [] : []
+          let leaveData = tasks?.messType == 'S' ? tasks?.messData?.[1] ||  [] : []
           this.ganttProps = {
             tooltipCls: 'custom-tooltip',
             project: {
@@ -510,8 +528,8 @@ export class GanttChartComponent {
                   tplData.style = `background-color: ${taskRecord.color || 'gray'}; border-color: ${taskRecord.borderColor || 'black'};`;
               }
             },
-            startDate : '2021-01-12',
-            endDate : '2026-03-24',
+            startDate : this.startDateForGanttDate,
+            endDate : this.endDateForGanttDate,
             features: {
               labels: {
                 right: {
@@ -614,12 +632,15 @@ export class GanttChartComponent {
               },
               { type: 'name', text: 'People / Task', field: 'name', width: 250, editor: false,
                 renderer: ({ record, cellElement }: { record: any, cellElement: HTMLElement }) => {
-                  cellElement.style.borderRight = 'none';
-                  cellElement.style.paddingTop = '12px';
-                  cellElement.style.paddingBottom = '8px';
-                  cellElement.style.overflow = 'hidden';
-                  cellElement.style.textOverflow = 'ellipsis';
-                  cellElement.style.whiteSpace = 'nowrap';
+                  // cellElement.style.borderRight = 'none';
+                  // const isActivity = record?.data?.is_activity === 1 || record?.data?.is_activity === true;
+                  // if(!isActivity){
+                  //   cellElement.style.paddingTop = '14px';
+                  // }
+                  // cellElement.style.paddingBottom = '10px';
+                  // cellElement.style.overflow = 'hidden';
+                  // cellElement.style.textOverflow = 'ellipsis';
+                  // cellElement.style.whiteSpace = 'nowrap';
                 
                   return `
                     <div 
@@ -634,12 +655,23 @@ export class GanttChartComponent {
                 afterRenderCell : ({ record, row, cellElement }: { record: any, row: any, cellElement: any }) => {
                   // cellElement.classList.toggle('myClass', true);
                   cellElement.style.borderRight = 'none';
-                  cellElement.style.paddingTop = '12px';
-                  cellElement.style.paddingBottom = '8px';
+                  const isActivity = record?.data?.is_activity === 1 || record?.data?.is_activity === true;
+                  if(!isActivity){
+                    cellElement.style.paddingTop = '14px';
+                  }
+                  else {
+                    cellElement.style.paddingTop = '0px';
+                  }
+                  cellElement.style.paddingBottom = '10px';
+                  cellElement.style.overflow = 'hidden';
+                  cellElement.style.textOverflow = 'ellipsis';
+                  cellElement.style.whiteSpace = 'nowrap';
+                  // cellElement.style.paddingTop = '12px';
+                  // cellElement.style.paddingBottom = '8px';
                   // row.cls.newRow = record.isPhantom;
                 }
               },
-              { text: 'Opportunity Name', field: 'opportunity_name', htmlEncode: false, width: 200, editor: false,
+              { text: 'Opportunity/Account/Lead/Contact Name', field: 'opportunity_name', htmlEncode: false, width: 200, editor: false,
                 renderer: ({ record, cellElement }: { record: any, cellElement: HTMLElement }) => {
                   cellElement.style.borderRight = 'none';
                   if(record?.data?.opportunity_name){
@@ -647,8 +679,28 @@ export class GanttChartComponent {
                     cellElement.addEventListener('click', (event) => {
                       this.routeToOpportunity(record);
                     });
+                    const isActivity = record?.data?.is_activity === 1 || record?.data?.is_activity === true;
+                    const id = isActivity ? record?.data?.application_reference_id : null;
+                    const app_id = isActivity ? record?.data?.application_id : null;
+                    let app_ids_master = [
+                      { display_text: "A.Id.", application_id: 33, application_name: "Accounts" },
+                      { display_text: "C.Id.", application_id: 34, application_name: "Contacts" },
+                      { display_text: "L.Id.", application_id: 35, application_name: "Leads" },
+                      { display_text: "O.Id.", application_id: 36, application_name: "Opportunities" },
+                    ]
+                    let app_obj = app_ids_master.find(app => app.application_id == app_id);
+                    let app_name = app_obj?.display_text ?? 'O.Id.';
+                    return `
+                    <span style="display:inline-flex; align-items:center; gap:6px;">
+                    ${app_name ? `<span>${app_name} -</span>` : ''}
+                    ${id ? `<span>${id} -</span>` : ''}
+                    <span>${record?.data?.opportunity_name ?? ''}</span>
+                    </span>
+                    `;
                   }
-                  return record?.data?.opportunity_name;
+                  else{
+                    return '';
+                  }
                 },
                 afterRenderCell : ({ record, row, cellElement }: { record: any, row: any, cellElement: any }) => {
                   // cellElement.classList.toggle('myClass', true);
@@ -747,14 +799,14 @@ export class GanttChartComponent {
         this.activitiesPlanningReportService.getActivitiesDataForGanttForId(this.tab, 35, this.startDateForData, this.endDateForData).subscribe((tasks: any) => {
           console.log("nEw leads activities data", tasks);
           this.isLoading = false;
-          let data = tasks?.messType == 'S' ? tasks?.messData[0] : []
+          let data = tasks?.messType == 'S' ? tasks?.messData?.[0] || [] : []
           this.ganttProps = {
             project: {
               autoLoad: true,
               tasksData: this.modifyTasksData(data)
             },
-            startDate : '2009-01-12',
-            endDate : '2029-03-24',
+            startDate : this.startDateForGanttDate,
+            endDate : this.endDateForGanttDate,
             taskRenderer: ({ taskRecord, taskElement }: { taskRecord: any, taskElement: any }) => {
               const taskName = taskRecord.name || 'No Name';
               
@@ -869,16 +921,28 @@ export class GanttChartComponent {
               // }
             },
             columns: [
-              { type: 'name', text: 'Lead / Task', field: 'name', width: 250, editor: false,
-                renderer: ({ record, cellElement }: { record: any, cellElement: HTMLElement }) => {
-                  cellElement.style.borderRight = 'none';
-                  return record.name;
-                },
-                afterRenderCell : ({ record, row, cellElement }: { record: any, row: any, cellElement: any }) => {
-                  // cellElement.classList.toggle('myClass', true);
-                  cellElement.style.borderRight = 'none';
-                  // row.cls.newRow = record.isPhantom;
-                }
+                { type: 'name', text: 'Lead / Task', field: 'name', width: 250, editor: false, htmlEncode: false,
+                  renderer: ({ record, cellElement }: { record: any, cellElement: HTMLElement }) => {
+                    cellElement.style.borderRight = 'none';
+                    const isActivity =
+                      record?.data?.is_activity === 1 || record?.data?.is_activity === true;
+                    const id = isActivity
+                      ? record?.application_reference_id
+                      : record?.id;
+                    const customerName = !isActivity ? record?.customer_name : null;
+                    return `
+                      <span style="display:inline-flex; align-items:center; gap:6px;">
+                        ${id ? `<span>${id} -</span>` : ''}
+                        <span>${record?.name ?? ''}</span>
+                        ${customerName ? `<span>- ${customerName}</span>` : ''}
+                      </span>
+                    `;
+                  },
+                  afterRenderCell : ({ record, row, cellElement }: { record: any, row: any, cellElement: any }) => {
+                    // cellElement.classList.toggle('myClass', true);
+                    cellElement.style.borderRight = 'none';
+                    // row.cls.newRow = record.isPhantom;
+                  }
               },
               { text: 'Assigned To', field: 'assigned_to', htmlEncode: false, width: 200, editor: false,
                 renderer: ({ record, cellElement }: { record: any, cellElement: HTMLElement }) => {
@@ -977,14 +1041,14 @@ export class GanttChartComponent {
         this.activitiesPlanningReportService.getActivitiesDataForGanttForId(this.tab, 33, this.startDateForData, this.endDateForData).subscribe((tasks: any) => {
           console.log("nEw accounts activities data", tasks);
           this.isLoading = false;
-          let data = tasks?.messType == 'S' ? tasks?.messData[0] : []
+          let data = tasks?.messType == 'S' ? tasks?.messData?.[0] || [] : []
           this.ganttProps = {
             project: {
               autoLoad: true,
               tasksData: this.modifyTasksData(data)
             },
-            startDate : '2009-01-12',
-            endDate : '2029-03-24',
+            startDate : this.startDateForGanttDate,
+            endDate : this.endDateForGanttDate,
             taskRenderer: ({ taskRecord, taskElement }: { taskRecord: any, taskElement: any }) => {
               const taskName = taskRecord.name || 'No Name';
               
@@ -1099,10 +1163,20 @@ export class GanttChartComponent {
               // }
             },
             columns: [
-              { type: 'name', text: 'Account / Task', field: 'name', width: 250, editor: false,
+              { type: 'name', text: 'Account / Task', field: 'name', width: 250, editor: false, htmlEncode: false,
                 renderer: ({ record, cellElement }: { record: any, cellElement: HTMLElement }) => {
                   cellElement.style.borderRight = 'none';
-                  return record.name;
+                  const isActivity =
+                    record?.data?.is_activity === 1 || record?.data?.is_activity === true;
+                  const id = isActivity
+                    ? record?.application_reference_id
+                    : record?.id;
+                  return `
+                    <span style="display:inline-flex; align-items:center; gap:6px;">
+                      ${id ? `<span>${id} -</span>` : ''}
+                      <span>${record?.name ?? ''}</span>
+                    </span>
+                  `;
                 },
                 afterRenderCell : ({ record, row, cellElement }: { record: any, row: any, cellElement: any }) => {
                   // cellElement.classList.toggle('myClass', true);
@@ -1112,6 +1186,250 @@ export class GanttChartComponent {
               },
               { text: 'Assigned To', field: 'assigned_to', htmlEncode: false, width: 200, editor: false,
                 renderer: ({ record, cellElement }: { record: any, cellElement: HTMLElement }) => {
+                  cellElement.style.borderRight = 'none';
+                  return `<div class="user-profile-placeholder" data-assigned-to="${record.assigned_to}"></div>`;
+                },
+                afterRenderCell : ({ record, row, cellElement }: { record: any, row: any, cellElement: any }) => {
+                  // cellElement.classList.toggle('myClass', true);
+                  cellElement.style.borderRight = 'none';
+                  // row.cls.newRow = record.isPhantom;
+                }
+              },
+              { text: 'Start Date', field: 'start_date', htmlEncode: false, width: 200, editor: false,
+                renderer: ({ record, cellElement }: { record: any, cellElement: HTMLElement }) => {
+                  cellElement.style.borderRight = 'none';
+                  if(record?.data?.is_activity === 1 || record?.data?.is_activity === true){
+                    return moment(record?.data?.startDate).format("DD MMM YYYY");
+                  }
+                  else{
+                    return;
+                  }
+                },
+                afterRenderCell : ({ record, row, cellElement }: { record: any, row: any, cellElement: any }) => {
+                  // cellElement.classList.toggle('myClass', true);
+                  cellElement.style.borderRight = 'none';
+                  // row.cls.newRow = record.isPhantom;
+                }
+              },
+              { text: 'End Date', field: 'end_date', htmlEncode: false, width: 200, editor: false,
+                renderer: ({ record, cellElement }: { record: any, cellElement: HTMLElement }) => {
+                  cellElement.style.borderRight = 'none';
+                  if(record?.data?.is_activity === 1 || record?.data?.is_activity === true){
+                    return moment(record?.data?.endDate).format("DD MMM YYYY");
+                  }
+                  else{
+                    return;
+                  }
+                },
+                afterRenderCell : ({ record, row, cellElement }: { record: any, row: any, cellElement: any }) => {
+                  // cellElement.classList.toggle('myClass', true);
+                  cellElement.style.borderRight = 'none';
+                  // row.cls.newRow = record.isPhantom;
+                }
+              },
+              { text: 'Status', field: 'activity_status_id', htmlEncode: false, width: 200, editor: false,
+                renderer: ({ record, cellElement }: { record: any, cellElement: HTMLElement }) => {
+                  // cellElement.style.borderRight = 'none';
+                  if(record?.data?.is_activity === 1 || record?.data?.is_activity === true){
+                    let cellParams = this.getActivityStatusColor(record?.data?.activity_status_id, this.statusColorArray)
+                    console.log('cellParams', cellParams);
+                    const chipHtml = `
+                      <span class="activity-chip"
+                            style="
+                              background-color: ${cellParams.statusColor};
+                              color: ${cellParams.statusTextColor};
+                              padding: 4px 10px;
+                              width: 86px;
+                              text-align: center;
+                              font-size: 12px;
+                              display: inline-block;
+                              font-weight: 500;
+                            ">
+                        ${cellParams.statusText}
+                      </span>
+                    `;
+
+                    return chipHtml;
+                  }
+                  else{
+                    return;
+                  }
+                },
+              },
+              { text: 'Actions', width: 50, editor: false,
+                
+              }
+            ],
+            listeners: {
+              beforeExpand: ({ record }: { record: any }) => {
+                if (!record.children.length) {
+                  // this.loadChildTasks(record);
+                }
+              },
+              taskdblclick: (event: any) => {
+                event.preventDefault();
+              }
+            }
+          };
+          this.initializeSlicerData(data);
+          // this.updateColumns();
+  
+        });
+      }
+      else if (this.tab === "Contacts"){
+        this.isLoading = true;
+        this.activitiesPlanningReportService.getActivitiesDataForGanttForId(this.tab, 34, this.startDateForData, this.endDateForData).subscribe((tasks: any) => {
+          this.isLoading = false;
+          let data = tasks?.messType == 'S' ? tasks?.messData?.[0] || [] : []
+          this.ganttProps = {
+            project: {
+              autoLoad: true,
+              tasksData: this.modifyTasksData(data)
+            },
+            startDate : this.startDateForGanttDate,
+            endDate : this.endDateForGanttDate,
+            taskRenderer: ({ taskRecord, taskElement }: { taskRecord: any, taskElement: any }) => {
+              const taskName = taskRecord.name || 'No Name';
+              
+              const taskBarContent = document.createElement('div');
+              taskBarContent.innerHTML = `
+                <span class="task-name">${taskName}</span>
+              `;
+        
+              taskBarContent.style.position = 'absolute';
+              taskBarContent.style.top = '50%';
+              taskBarContent.style.left = '50%';
+              taskBarContent.style.transform = 'translate(-50%, -50%)';
+              taskBarContent.style.color = 'white';
+              taskBarContent.style.fontWeight = 'bold';
+              taskBarContent.style.fontSize = '12px';
+        
+              taskElement.appendChild(taskBarContent);
+            },
+            features: {
+              labels: {
+                right: {
+                   renderer : ({ taskRecord }: { taskRecord: any }) => {
+                    if(taskRecord?.data?.is_activity === 1 || taskRecord?.data?.is_activity === true){
+                      let currentDate = moment();
+                      let statusToCheck = [1,2,7];
+                      if((moment(taskRecord?.data?.endDate) < currentDate) && statusToCheck.includes(taskRecord?.data?.activity_status_id)){
+                        return '!'
+                      }
+                      else{
+                        return;
+                      }
+                    }
+                    else{
+                      return;
+                    }
+                  }
+                }
+              },
+              taskTooltip : {
+                template : ({ taskRecord }: { taskRecord: any }) => {
+                  if(taskRecord?.data?.is_activity == 1 || taskRecord?.data?.is_activity == true){
+                    return `
+                      <div style="display: flex; flex-direction: column; gap: 4px;">
+                        <div style="display: flex; justify-content: between; gap: 14px;">
+                          <div>Name</div>
+                          <div>:</div>
+                          <span>${taskRecord.name}</span>
+                        </div>
+                        <div style="display: flex; justify-content: between; gap: 14px;">
+                          <div>Start Date</div>
+                          <div>:</div>
+                          <span>${moment(taskRecord.startDate).format('DD-MM-YYYY')}</span>
+                        </div>
+                        <div style="display: flex; justify-content: between; gap: 14px;">
+                          <div>Due Date</div>
+                          <div>:</div>
+                          <span>${moment(taskRecord.endDate).format('DD-MM-YYYY')}</span>
+                        </div>
+                        <div style="display: flex; justify-content: between; gap: 14px;">
+                          <div>Activity Status</div>
+                          <div>:</div>
+                          <span>${this.getActivityStatusColor(taskRecord?.data?.activity_status_id, this.statusColorArray).statusText}</span>
+                        </div>
+                      </div>
+                    `;
+                  }
+                  else{
+                    return `
+                      <div style="display: flex; flex-direction: column; gap: 4px;">
+                        <div style="display: flex; justify-content: between; gap: 14px;">
+                          <div>Contact Name</div>
+                          <div>:</div>
+                          <span>${taskRecord.name}</span>
+                        </div>
+                        <div style="display: flex; justify-content: between; gap: 14px;">
+                          <div>Start Date</div>
+                          <div>:</div>
+                          <span>${moment(taskRecord.startDate).format('DD-MM-YYYY')}</span>
+                        </div>
+                        <div style="display: flex; justify-content: between; gap: 14px;">
+                          <div>Due Date</div>
+                          <div>:</div>
+                          <span>${moment(taskRecord.endDate).format('DD-MM-YYYY')}</span>
+                        </div>
+                      </div>
+                    `;
+                  }
+                }
+              },              
+              scrollButtons: true,
+              projectLines: false,
+              taskEdit: false,
+              dependencies: false,
+              pan : true,
+              eventDragCreate : false,
+              taskSelection: {
+                enabled: false,
+              },
+              // taskTooltip: {
+              //   enabled: true,
+              //   template: null,
+              //   tooltipTemplate({ taskRecord }: { taskRecord: any }) {
+              //     console.log('Tooltip triggered for:', taskRecord.name);
+              //     return `
+              //       <div class="custom-tooltip">
+              //         <p><strong>${taskRecord.name || 'Leave'}</strong></p>
+              //         <p>Start: ${DateHelper.format(taskRecord.startDate, 'L')}</p>
+              //         <p>End: ${DateHelper.format(taskRecord.endDate, 'L')}</p>
+              //       </div>
+              //     `;
+              //   }
+              // }
+            },
+            columns: [
+              { type: 'name', text: 'Contact / Task', field: 'name', width: 250, editor: false, htmlEncode: false,
+                renderer: ({ record, cellElement }: { record: any, cellElement: HTMLElement }) => {
+                  cellElement.style.borderRight = 'none';
+                  const isActivity =
+                    record?.data?.is_activity === 1 || record?.data?.is_activity === true;
+                  const id = isActivity
+                    ? record?.application_reference_id
+                    : record?.id;
+                  const customerName = !isActivity ? record?.customer_name : null;
+                  return `
+                    <span style="display:inline-flex; align-items:center; gap:6px;">
+                      ${id ? `<span>${id} -</span>` : ''}
+                      <span>${record?.name ?? ''}</span>
+                      ${customerName ? `<span>- ${customerName}</span>` : ''}
+                    </span>
+                  `;
+                },
+                afterRenderCell : ({ record, row, cellElement }: { record: any, row: any, cellElement: any }) => {
+                  // cellElement.classList.toggle('myClass', true);
+                  cellElement.style.borderRight = 'none';
+                  // row.cls.newRow = record.isPhantom;
+                }
+              },
+              { text: 'Assigned To', field: 'assigned_to', htmlEncode: false, width: 200, editor: false,
+                renderer: ({ record, cellElement }: { record: any, cellElement: HTMLElement }) => {
+                  console.log('test for record assigned_to', record);
+                  console.log('test for record.data.assigned_to assigned_to', record.data.assigned_to);
+                  console.log('test for record.assigned_to assigned_to', record.assigned_to);
                   cellElement.style.borderRight = 'none';
                   return `<div class="user-profile-placeholder" data-assigned-to="${record.assigned_to}"></div>`;
                 },
@@ -1270,16 +1588,25 @@ export class GanttChartComponent {
                 ? 35
                 : this.tab === 'Accounts'
                   ? 33
-                  : null,
+                  : this.tab === 'Contacts'
+                    ? 34
+                      : 36,
           formData: res[0],
-          masterData:
-            this.tab === 'Opportunities'
-              ? this.masterOpportunitiesList
-              : this.tab === 'Leads'
-                ? this.masterLeadsList
-                : this.tab === 'Accounts'
-                  ? this.masterAccountsList
-                  : this.masterOpportunitiesList
+          masterData: [
+            { id: 33, data: this.masterAccountsList},
+            { id: 34, data: this.masterContactsList},
+            { id: 35, data: this.masterLeadsList},
+            { id: 36, data: this.masterOpportunitiesList},
+          ]
+            // this.tab === 'Opportunities'
+            //   ? this.masterOpportunitiesList
+            //   : this.tab === 'Leads'
+            //     ? this.masterLeadsList
+            //     : this.tab === 'Accounts'
+            //       ? this.masterAccountsList
+            //         : this.tab === 'Contacts'
+            //         ? this.masterContactsList
+            //           : this.masterOpportunitiesList
           }
         });
         dialogRef.afterClosed().subscribe(async result => {
@@ -1320,7 +1647,7 @@ export class GanttChartComponent {
   
       if (changes.startDate || changes.endDate) {
         this.activitiesPlanningReportService.updateActivityDates((record as any).data.id, record.startDate, record.endDate).subscribe((task: any) => {
-          if(this.tab == 'Opportunities' || this.tab == 'Leads' || this.tab == 'Accounts'){
+          if(this.tab == 'Opportunities' || this.tab == 'Leads' || this.tab == 'Accounts' || this.tab == 'Contacts'){
             this.loadChildTasks(ganttInstance.taskStore.getById((record as any).data?.application_reference_id));
             this.cdr.detectChanges();
           }
@@ -1354,7 +1681,7 @@ export class GanttChartComponent {
     });
 
     columns.forEach((col: any) => {
-      if ((this.tab === "Opportunities" || this.tab === "Accounts" || this.tab === "Leads") && col.data.field === 'assigned_to') {
+      if ((this.tab === "Opportunities" || this.tab === "Accounts" || this.tab === "Leads" || this.tab === "Contacts") && col.data.field === 'assigned_to') {
         col.renderer = (value: any, task: any, column: any) => {
           if (value?.record?.data?.sales_activity_id !== undefined || value?.record?.data?.sales_activity_id != null){
             
@@ -1411,7 +1738,12 @@ export class GanttChartComponent {
 
     // ✅ Existing properties
     componentRef.instance.column = value?.record?.data;
-    componentRef.instance.masterData = this.tab === 'Opportunities' ? this.masterOpportunitiesList : this.tab === 'Leads' ? this.masterLeadsList : this.tab === 'Accounts' ? this.masterAccountsList : this.masterOpportunitiesList;
+    componentRef.instance.masterData = [
+            { id: 33, data: this.masterAccountsList},
+            { id: 34, data: this.masterContactsList},
+            { id: 35, data: this.masterLeadsList},
+            { id: 36, data: this.masterOpportunitiesList},
+          ]
 
 
     // ✅ Add this line
@@ -1537,7 +1869,12 @@ export class GanttChartComponent {
             application_reference_id: taskEvent.taskRecord.data?.application_reference_id,
             application_id: 36,
             formData: res[0],
-            masterData: this.masterOpportunitiesList
+            masterData: [
+            { id: 33, data: this.masterAccountsList},
+            { id: 34, data: this.masterContactsList},
+            { id: 35, data: this.masterLeadsList},
+            { id: 36, data: this.masterOpportunitiesList},
+          ]
           }
         });
         dialogRef.afterClosed().subscribe(async result => {
@@ -1584,13 +1921,19 @@ export class GanttChartComponent {
   
       if (changes.startDate || changes.endDate) {
         this.activitiesPlanningReportService.updateActivityDates((record as any).data.id, record.startDate, record.endDate).subscribe((task: any) => {
-          if(this.tab == 'Opportunities'){
+          if(this.tab == 'Opportunities' || this.tab == 'Leads' || this.tab == 'Accounts' || this.tab == 'Contacts'){
             this.loadChildTasks(ganttInstance.taskStore.getById((record as any).data?.application_reference_id));
             this.cdr.detectChanges();
           }
           else if(this.tab == 'People'){
-            this.loadChildTasks(ganttInstance.taskStore.getById((record as any).data?.assigned_to));
-            this.cdr.detectChanges();
+            const parentRecord = (record as any).parent;
+            
+            if (parentRecord) {
+              this.loadChildTasks(parentRecord);
+              this.cdr.detectChanges();
+            }
+            // this.loadChildTasks(ganttInstance.taskStore.getById((record as any).data?.assigned_to));
+            // this.cdr.detectChanges();
           }
           this.showSnackBar("Date has been updated", 2000);
         });
@@ -1619,7 +1962,7 @@ export class GanttChartComponent {
     });
 
     columns.forEach((col: any) => {
-      if ((this.tab === "Opportunities" || this.tab === "Accounts" || this.tab === "Leads")  && col.data.field === 'assigned_to') {
+      if ((this.tab === "Opportunities" || this.tab === "Accounts" || this.tab === "Leads" || this.tab === "Contacts")  && col.data.field === 'assigned_to') {
         col.renderer = (value: any, task: any, column: any) => {
           if (value?.record?.data?.sales_activity_id !== undefined || value?.record?.data?.sales_activity_id != null){
             
@@ -1676,14 +2019,12 @@ export class GanttChartComponent {
             });
       
             componentRef.instance.column = value?.record?.data;
-          componentRef.instance.masterData =
-          this.tab === 'Opportunities'
-            ? this.masterOpportunitiesList
-            : this.tab === 'Leads'
-              ? this.masterLeadsList
-              : this.tab === 'Accounts'
-                ? this.masterAccountsList
-                : this.masterOpportunitiesList;
+          componentRef.instance.masterData = [
+            { id: 33, data: this.masterAccountsList},
+            { id: 34, data: this.masterContactsList},
+            { id: 35, data: this.masterLeadsList},
+            { id: 36, data: this.masterOpportunitiesList},
+          ]
 
             componentRef.instance.tab = this.tab;
 
@@ -1883,7 +2224,7 @@ export class GanttChartComponent {
     const query = event.target.value.toLowerCase();
     const fieldsToSearch = ['name'];
     let parentIdArray: any[] = [];
-    if (this.tab == 'Opportunities'){
+    if (this.tab == 'Opportunities' || this.tab == 'Leads' || this.tab == 'Accounts' || this.tab == 'Contacts'){
       this.ganttCmp.instance.taskStore.forEach((record: any) => {
         if (record?.data?.is_activity !== 1 && record?.data?.is_activity !== true){
           if ((record?.data?.name).toLowerCase().includes(query.toLowerCase())){
@@ -2098,15 +2439,15 @@ export class GanttChartComponent {
         ? 35
         : this.tab === 'Accounts'
           ? 33
-          : null,
-  masterData:
-    this.tab === 'Opportunities'
-      ? this.masterOpportunitiesList
-      : this.tab === 'Leads'
-        ? this.masterLeadsList
-        : this.tab === 'Accounts'
-          ? this.masterAccountsList
-          : this.masterOpportunitiesList
+            : this.tab === 'Contacts'
+              ? 34
+                : 36,
+  masterData: [
+            { id: 33, data: this.masterAccountsList},
+            { id: 34, data: this.masterContactsList},
+            { id: 35, data: this.masterLeadsList},
+            { id: 36, data: this.masterOpportunitiesList},
+          ]
 }
 
       });
@@ -2128,6 +2469,7 @@ export class GanttChartComponent {
     }
     this.isGanttRefreshRequired = true;
     this.tab = 'People';
+    this.isSlicerOn = false;
     this.loadHeaderTasks();
     this.cdr.detectChanges();
   }
@@ -2137,6 +2479,7 @@ export class GanttChartComponent {
       return;
     }
     this.isGanttRefreshRequired = true;
+    this.isSlicerOn = false;
     this.tab = 'Opportunities';
     this.loadHeaderTasks();
     this.cdr.detectChanges();
@@ -2147,6 +2490,7 @@ export class GanttChartComponent {
       return;
     }
     this.isGanttRefreshRequired = true;
+    this.isSlicerOn = false;
     this.tab = 'Leads';
     this.loadHeaderTasks();
     this.cdr.detectChanges();
@@ -2157,7 +2501,19 @@ export class GanttChartComponent {
       return;
     }
     this.isGanttRefreshRequired = true;
+    this.isSlicerOn = false;
     this.tab = 'Accounts';
+    this.loadHeaderTasks();
+    this.cdr.detectChanges();
+  }
+
+  changeTabToContacts(){
+    if(this.tab == 'Contacts'){
+      return;
+    }
+    this.isGanttRefreshRequired = true;
+    this.isSlicerOn = false;
+    this.tab = 'Contacts';
     this.loadHeaderTasks();
     this.cdr.detectChanges();
   }
@@ -2166,7 +2522,7 @@ export class GanttChartComponent {
     const ganttInstance = this.ganttCmp.instance;
     let columns: any[] = Array.isArray(ganttInstance.columns) ? ganttInstance.columns : (ganttInstance.columns as any)?.allRecords || [];
     columns.forEach((col: any) => {
-      if ((this.tab === "Opportunities" || this.tab === "Accounts" || this.tab === "Leads") && col?.data?.field === 'assigned_to') {
+      if ((this.tab === "Opportunities" || this.tab === "Accounts" || this.tab === "Leads" || this.tab === "Contacts") && col?.data?.field === 'assigned_to') {
         col.renderer = (value: any, task: any, column: any) => {
           if (value?.record?.data?.sales_activity_id !== undefined || value?.record?.data?.sales_activity_id != null) {
             const container = document.createElement('div');
@@ -2210,7 +2566,12 @@ export class GanttChartComponent {
           });
   
           componentRef.instance.column = value?.record?.data;
-          componentRef.instance.masterData = this.tab === 'Opportunities' ? this.masterOpportunitiesList : this.tab === 'Leads' ? this.masterLeadsList : this.tab === 'Accounts' ? this.masterAccountsList : this.masterOpportunitiesList;
+          componentRef.instance.masterData = [
+            { id: 33, data: this.masterAccountsList},
+            { id: 34, data: this.masterContactsList},
+            { id: 35, data: this.masterLeadsList},
+            { id: 36, data: this.masterOpportunitiesList},
+          ]
           componentRef.instance.tab = this.tab;
           container.appendChild(componentRef.location.nativeElement);
           componentRef.changeDetectorRef.detectChanges();
@@ -2352,12 +2713,14 @@ export class GanttChartComponent {
     let seenSo = new Set<string>();
     let seenOwner = new Set<string>();
     let seenStatus = new Set<string>();
+    let seenPresalesStatus = new Set<string>();
 
     this.sbuArray = [];
     this.buArray = [];
     this.soArray = [];
     this.ownerArray = [];
     this.statusArray = [];
+    this.presalesStatusArray = [];
 
     data.forEach((item: any) => {
       item?.children?.forEach((child: any) => {
@@ -2408,12 +2771,23 @@ export class GanttChartComponent {
         }
       });
     });
+
+     data.forEach((item: any) => {
+      item?.children?.forEach((child: any) => {
+        const presalesStatus = child?.proposal_status_name;
+        if (presalesStatus && !seenPresalesStatus.has(presalesStatus)) {
+          seenPresalesStatus.add(presalesStatus);
+          this.presalesStatusArray.push({ name: presalesStatus, isClicked: true, isSelected: false });
+        }
+      });
+    });
     
     this.sbuMain = this.sbuArray;
     this.buMain = this.buArray;
     this.soMain = this.soArray;
     this.ownerMain = this.ownerArray;
     this.statusMain = this.statusArray;
+    this.presalesStatusMain = this.presalesStatusArray;
 
     this.isSlicerLoading = false;
 
@@ -2422,14 +2796,20 @@ export class GanttChartComponent {
       BU: this.buArray,
       Owner: this.ownerArray,
       SO: this.soArray,
-      Status : this.statusArray
+      Status: this.statusArray,
+      ...(this.tab === 'Opportunities' && {
+        'Presales Status': this.presalesStatusArray
+      })
     };
     this.filterConfig = {
       SBU: this.sbuFilter,
       BU: this.buFilter,
       Owner: this.ownerFilter,
       SO: this.salesOrgFilter,
-      Status: this.statusFilter
+      Status: this.statusFilter,
+      ...(this.tab === 'Opportunities' && {
+        'Presales Status': this.presalesStatusFilter
+      })
     }
     this.activitiesPlanningReportService.slicerData = this.slicerData;
     this.activitiesPlanningReportService.filterConfigService = this.filterConfig;
@@ -2456,6 +2836,9 @@ export class GanttChartComponent {
       case 'Status':
         this.updateLevelFilter('activity_status_name', this.selectedItem);
         break; 
+      case 'Presales Status':
+        this.updateLevelFilter('proposal_status_name', this.selectedItem);
+        break; 
       default:
         console.log("no such slicer");
         break;
@@ -2466,12 +2849,16 @@ export class GanttChartComponent {
     this.ownerFilter = _.contains(_.keys(this.filterModel),"sales_owner_name")
     this.salesOrgFilter = _.contains(_.keys(this.filterModel),"sales_unit_name")
     this.statusFilter = _.contains(_.keys(this.filterModel),"activity_status_name")
+    this.presalesStatusFilter = _.contains(_.keys(this.filterModel),"proposal_status_name")
     this.filterConfig = {
       SBU:this.sbuFilter,
       BU: this.buFilter,
       Owner: this.ownerFilter,
       SO: this.salesOrgFilter,
-      Status: this.statusFilter
+      Status: this.statusFilter,
+      ...(this.tab === 'Opportunities' && {
+        'Presales Status': this.presalesStatusFilter
+      })
     }
     // this.slicerData = {
     //   SBU: this.sbuArray,
@@ -2498,6 +2885,7 @@ export class GanttChartComponent {
     let ownerSet: any = [];
     let soSet: any = [];
     let statusSet : any = [];
+    let presalesStatusSet : any = [];
     filteredData.forEach((data: any) => {
       data?.children?.forEach((child: any) => {
         sbuSet.push(child?.data?.sbu);
@@ -2505,6 +2893,7 @@ export class GanttChartComponent {
         ownerSet.push(child?.data?.sales_owner_name);
         soSet.push(child?.data?.sales_unit_name);
         statusSet.push(child?.data?.activity_status_name);
+        presalesStatusSet.push(child?.data?.proposal_status_name);
       });
     });
     sbuSet = new Set(sbuSet);
@@ -2512,11 +2901,13 @@ export class GanttChartComponent {
     ownerSet = new Set(ownerSet);
     soSet = new Set(soSet);
     statusSet = new Set(statusSet);
+    presalesStatusSet = new Set(presalesStatusSet);
     this.updateHighlightedItems(this.sbuArray, sbuSet);
     this.updateHighlightedItems(this.buArray, buSet);
     this.updateHighlightedItems(this.ownerArray, ownerSet);
     this.updateHighlightedItems(this.soArray, soSet);
     this.updateHighlightedItems(this.statusArray, statusSet);
+    this.updateHighlightedItems(this.presalesStatusArray, presalesStatusSet);
     this.sbuArray = _.sortBy(this.sbuArray, function (item) {
       return !item.isClicked;
     });
@@ -2533,19 +2924,28 @@ export class GanttChartComponent {
     this.statusArray = _.sortBy(this.statusArray, function (item) {
       return !item.isClicked;
     });
+    this.presalesStatusArray = _.sortBy(this.presalesStatusArray, function (item) {
+      return !item.isClicked;
+    });
     this.slicerData = {
       SBU: this.sbuArray,
       BU: this.buArray,
       Owner: this.ownerArray,
       SO: this.soArray,
-      Status : this.statusArray
+      Status : this.statusArray,
+      ...(this.tab === 'Opportunities' && {
+        'Presales Status': this.presalesStatusArray
+      })
     };
     this.activitiesPlanningReportService.slicerData = this.slicerData;
     this.checkIfResetButtonPresent();
   }
 
   updateallSlicerArrays() {
-    const keysToUpdate = ['SBU', 'BU', 'SO', 'Owner', 'Status'];
+    let keysToUpdate = ['SBU', 'BU', 'SO', 'Owner', 'Status'];
+    if(this.tab == 'Opportunities'){
+      keysToUpdate.push('Presales Status');
+    }
 
     keysToUpdate.forEach(key => {
       const slicerArray = this.slicerData[key];
@@ -2630,6 +3030,13 @@ export class GanttChartComponent {
         delete this.filterModel["activity_status_name"];
         this.statusFilter = false
         break;
+      case 'Presales Status':
+        this.presalesStatusArray.forEach(item => item.isSelected = false);
+        this.updateLevelFilter('proposal_status_name', null);
+        this.presalesStatusArray = [...this.presalesStatusMain];
+        delete this.filterModel["proposal_status_name"];
+        this.presalesStatusFilter = false
+        break;
       default:
         console.log("no such slicer");
         break;
@@ -2640,7 +3047,10 @@ export class GanttChartComponent {
       BU: this.buFilter,
       Owner: this.ownerFilter,
       SO: this.salesOrgFilter,
-      Status: this.statusFilter
+      Status: this.statusFilter,
+      ...(this.tab === 'Opportunities' && {
+        'Presales Status': this.presalesStatusFilter
+      })
     }
     if (JSON.stringify(this.filterModel) === '{}') {
       this.isResetButtonPresent = false;
@@ -2662,12 +3072,14 @@ export class GanttChartComponent {
     let seenSo = new Set<string>();
     let seenOwner = new Set<string>();
     let seenStatus = new Set<string>();
+    let seenPresalesStatus = new Set<string>();
 
     this.sbuArray = [];
     this.buArray = [];
     this.soArray = [];
     this.ownerArray = [];
     this.statusArray = [];
+    this.presalesStatusArray = [];
 
     this.ganttCmp?.instance?.taskStore.records.forEach(parent => {
       parent.allChildren.forEach(child => {
@@ -2676,6 +3088,7 @@ export class GanttChartComponent {
         const so = child?.getData("sales_unit_name");
         const owner = child?.getData("sales_owner_name");
         const status = child?.getData("activity_status_name");
+        const presalesStatus = child?.getData("proposal_status_name");
 
         if (sbu && !seenSbu.has(sbu)) {
           seenSbu.add(sbu);
@@ -2697,6 +3110,10 @@ export class GanttChartComponent {
           seenStatus.add(status);
           this.statusArray.push({ name: status, isClicked: true, isSelected: false });
         }
+        if (presalesStatus && !seenPresalesStatus.has(presalesStatus)) {
+          seenPresalesStatus.add(presalesStatus);
+          this.presalesStatusArray.push({ name: status, isClicked: true, isSelected: false });
+        }
 
       })
     });
@@ -2706,24 +3123,32 @@ export class GanttChartComponent {
     this.ownerMain = this.ownerArray;
     this.soMain = this.soArray;
     this.statusMain = this.statusArray;
+    this.presalesStatusMain = this.presalesStatusArray;
     this.slicerData = {
       SBU: this.sbuArray,
       BU: this.buArray,
       Owner: this.ownerArray,
       SO: this.soArray,
-      Status : this.statusArray
-    }; 
+      Status : this.statusArray,
+      ...(this.tab === 'Opportunities' && {
+        'Presales Status': this.presalesStatusArray
+      })
+    };
     this.sbuFilter = _.contains(_.keys(this.filterModel),"sbu")
     this.buFilter = _.contains(_.keys(this.filterModel),"bu")
     this.ownerFilter = _.contains(_.keys(this.filterModel),"sales_owner_name")
     this.salesOrgFilter = _.contains(_.keys(this.filterModel),"sales_unit_name")
     this.statusFilter = _.contains(_.keys(this.filterModel),"activity_status_name")
+    this.presalesStatusFilter = _.contains(_.keys(this.filterModel),"proposal_status_name")
     this.filterConfig = {
       SBU:this.sbuFilter,
       BU: this.buFilter,
       Owner: this.ownerFilter,
       SO: this.salesOrgFilter,
-      Status: this.statusFilter
+      Status: this.statusFilter,
+      ...(this.tab === 'Opportunities' && {
+        'Presales Status': this.presalesStatusArray
+      })
     }
     this.activitiesPlanningReportService.filterConfigService = this.filterConfig;
     this.activitiesPlanningReportService.slicerData = this.slicerData;
